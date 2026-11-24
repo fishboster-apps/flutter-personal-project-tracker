@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_fishboster_personal_project_tracker/core/theme.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/milestone_model.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/project_model.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/repositories/brainstorm_repository.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/repositories/issue_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/milestone_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/project_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/projects/project_detail_screen.dart';
@@ -77,14 +79,30 @@ class FakeMilestoneRepository extends Fake implements MilestoneRepository {
   Future<List<MilestoneModel>> getMilestonesByProjectId(int projectId) async => [];
 }
 
+class FakeBrainstormRepository extends Fake implements BrainstormRepository {
+  @override
+  Future<ItemSummaryCount> getCountByProject(int projectId) async =>
+      const ItemSummaryCount(total: 0, completed: 0);
+}
+
+class FakeIssueRepository extends Fake implements IssueRepository {
+  @override
+  Future<ItemSummaryCount> getCountByProject(int projectId) async =>
+      const ItemSummaryCount(total: 0, completed: 0);
+}
+
 void main() {
   group('Presentation Layer Tests', () {
     late FakeProjectRepository repository;
     late FakeMilestoneRepository milestoneRepository;
+    late FakeBrainstormRepository brainstormRepository;
+    late FakeIssueRepository issueRepository;
 
     setUp(() {
       repository = FakeProjectRepository();
       milestoneRepository = FakeMilestoneRepository();
+      brainstormRepository = FakeBrainstormRepository();
+      issueRepository = FakeIssueRepository();
     });
 
     testWidgets('ProjectListScreen shows empty state initially', (tester) async {
@@ -200,6 +218,8 @@ void main() {
             projectId: id,
             repository: repository,
             milestoneRepository: milestoneRepository,
+            brainstormRepository: brainstormRepository,
+            issueRepository: issueRepository,
           ),
         ),
       );

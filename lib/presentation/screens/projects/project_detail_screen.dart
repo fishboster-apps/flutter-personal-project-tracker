@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/project_model.dart';
+import '../../../data/repositories/brainstorm_repository.dart';
+import '../../../data/repositories/issue_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/project_repository.dart';
 import '../../widgets/confirm_delete_dialog.dart';
+import '../brainstorms/brainstorm_list_screen.dart';
+import '../issues/issue_list_screen.dart';
 import '../milestones/milestone_list_screen.dart';
 import 'project_form_screen.dart';
 
@@ -13,12 +17,16 @@ class ProjectDetailScreen extends StatefulWidget {
   final int projectId;
   final ProjectRepository? repository;
   final MilestoneRepository? milestoneRepository;
+  final BrainstormRepository? brainstormRepository;
+  final IssueRepository? issueRepository;
 
   const ProjectDetailScreen({
     super.key,
     required this.projectId,
     this.repository,
     this.milestoneRepository,
+    this.brainstormRepository,
+    this.issueRepository,
   });
 
   @override
@@ -28,10 +36,16 @@ class ProjectDetailScreen extends StatefulWidget {
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late final ProjectRepository _repository;
   late final MilestoneRepository _milestoneRepository;
+  late final BrainstormRepository _brainstormRepository;
+  late final IssueRepository _issueRepository;
 
   ProjectModel? _project;
   MilestoneProgress _milestoneProgress =
       const MilestoneProgress(total: 0, completed: 0);
+  ItemSummaryCount _brainstormCount =
+      const ItemSummaryCount(total: 0, completed: 0);
+  ItemSummaryCount _issueCount =
+      const ItemSummaryCount(total: 0, completed: 0);
   bool _isLoading = true;
 
   @override
@@ -39,6 +53,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     super.initState();
     _repository = widget.repository ?? ProjectRepository();
     _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
+    _brainstormRepository = widget.brainstormRepository ?? BrainstormRepository();
+    _issueRepository = widget.issueRepository ?? IssueRepository();
     _loadProject();
   }
 
@@ -47,11 +63,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     final project = await _repository.getProjectById(widget.projectId);
     final progress =
         await _milestoneRepository.getProjectProgress(widget.projectId);
+    final brainstormCount =
+        await _brainstormRepository.getCountByProject(widget.projectId);
+    final issueCount =
+        await _issueRepository.getCountByProject(widget.projectId);
 
     if (mounted) {
       setState(() {
         _project = project;
         _milestoneProgress = progress;
+        _brainstormCount = brainstormCount;
+        _issueCount = issueCount;
         _isLoading = false;
       });
     }
@@ -269,7 +291,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             ),
             const SizedBox(height: 8),
 
-            // 1. Milestones - Interactive Navigation
+            // 1. Milestones
             _buildFeatureTile(
               icon: Icons.flag_outlined,
               title: 'Tahapan / Milestones',
@@ -291,20 +313,50 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               },
             ),
 
-            // 2. Ide & Gagasan (Phase 4)
+            // 2. Ide & Gagasan (Phase 4 Active)
             _buildFeatureTile(
               icon: Icons.lightbulb_outline,
               title: 'Ide & Gagasan',
-              subtitle: '0 Ide',
-              onTap: () => _showComingSoon('Ide & Gagasan'),
+              subtitle: _brainstormCount.total == 0
+                  ? '0 Ide'
+                  : '${_brainstormCount.total} Ide (${_brainstormCount.uncompleted} aktif)',
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BrainstormListScreen(
+                      projectId: project.id!,
+                      projectName: project.name,
+                      repository: _brainstormRepository,
+                      milestoneRepository: _milestoneRepository,
+                    ),
+                  ),
+                );
+                _loadProject();
+              },
             ),
 
-            // 3. Masalah & Kendala (Phase 4)
+            // 3. Masalah & Kendala (Phase 4 Active)
             _buildFeatureTile(
               icon: Icons.bug_report_outlined,
               title: 'Masalah & Kendala',
-              subtitle: '0 Masalah',
-              onTap: () => _showComingSoon('Masalah & Kendala'),
+              subtitle: _issueCount.total == 0
+                  ? '0 Masalah'
+                  : '${_issueCount.total} Masalah (${_issueCount.uncompleted} aktif)',
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => IssueListScreen(
+                      projectId: project.id!,
+                      projectName: project.name,
+                      repository: _issueRepository,
+                      milestoneRepository: _milestoneRepository,
+                    ),
+                  ),
+                );
+                _loadProject();
+              },
             ),
 
             // 4. Referensi Tautan (Phase 5)
