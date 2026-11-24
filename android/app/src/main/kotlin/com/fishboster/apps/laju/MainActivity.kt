@@ -1,4 +1,4 @@
-package com.example.flutter_fishboster_personal_project_tracker
+package com.fishboster.apps.laju
 
 import io.flutter.embedding.android.FlutterActivity
 

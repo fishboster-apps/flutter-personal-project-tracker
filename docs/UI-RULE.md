@@ -81,6 +81,10 @@ Seluruh input teks (`TextField`, `TextFormField`) dan pilihan (`DropdownButtonFo
    - Focused border: `AppColors.primaryAccent` (`#8B9CF6`) dengan ketebalan `1.5`.
    - Error border: `AppColors.error` (`#E98282`).
 
+5. **Dropdown Terbuka Penuh & Truncation (`isExpanded: true`):**
+   - Setiap `DropdownButtonFormField` wajib memiliki `isExpanded: true` agar lebar komponen menyesuaikan kontainer dialog/layar dan tidak menyebabkan horizontal overflow saat teks opsi bernilai panjang.
+   - Seluruh item teks di dalam `DropdownMenuItem` wajib memiliki `overflow: TextOverflow.ellipsis`.
+
 ---
 
 ## 4. Standar Bahasa Visual (Human Indo: Singkat, Jelas, dan Tegas)

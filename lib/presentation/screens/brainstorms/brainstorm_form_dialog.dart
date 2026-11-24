@@ -195,6 +195,7 @@ class _BrainstormFormDialogState extends State<BrainstormFormDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<int?>(
                 initialValue: _selectedMilestoneId,
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Hubungkan ke Tahapan (Opsional)',
                 ),
@@ -203,6 +204,7 @@ class _BrainstormFormDialogState extends State<BrainstormFormDialog> {
                     value: null,
                     child: Text(
                       'Tanpa Tahapan (Ide Bebas)',
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 12, color: AppColors.primaryText),
                     ),
                   ),

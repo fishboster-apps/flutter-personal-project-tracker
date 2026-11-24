@@ -153,6 +153,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
               const SizedBox(height: 20),
               DropdownButtonFormField<ProjectStatus>(
                 initialValue: _selectedStatus,
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Status Proyek',
                 ),

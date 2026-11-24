@@ -299,6 +299,55 @@ void main() {
       expect(brainstormRepo.items.first.title, equals('Implement biometric lock'));
     });
 
+    testWidgets('BrainstormFormDialog handles long milestone names without overflow', (tester) async {
+      milestoneRepo.milestones.add(
+        MilestoneModel(
+          id: 1,
+          projectId: 1,
+          name: 'Preparation 2 : Rencana Perbaikan Bug dan Refactoring Sistem Sangat Panjang',
+          sortOrder: 0,
+        ),
+      );
+
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () {
+                  BrainstormFormDialog.show(
+                    context,
+                    projectId: 1,
+                    repository: brainstormRepo,
+                    milestoneRepository: milestoneRepo,
+                  );
+                },
+                child: const Text('Open Dialog'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Dialog'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownButtonFormField<int?>));
+      await tester.pumpAndSettle();
+
+      final longItem = find.textContaining('Preparation 2').last;
+      await tester.tap(longItem);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('BrainstormDetailScreen shows info and handles delete', (tester) async {
       final id = await brainstormRepo.insertBrainstorm(
         BrainstormModel(
@@ -438,6 +487,55 @@ void main() {
 
       expect(issueRepo.items.length, equals(1));
       expect(issueRepo.items.first.title, equals('Crash on Android 14'));
+    });
+
+    testWidgets('IssueFormDialog handles long milestone names without overflow', (tester) async {
+      milestoneRepo.milestones.add(
+        MilestoneModel(
+          id: 2,
+          projectId: 1,
+          name: 'Preparation 2 : Rencana Perbaikan Bug dan Refactoring Sistem Sangat Panjang',
+          sortOrder: 0,
+        ),
+      );
+
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () {
+                  IssueFormDialog.show(
+                    context,
+                    projectId: 1,
+                    repository: issueRepo,
+                    milestoneRepository: milestoneRepo,
+                  );
+                },
+                child: const Text('Open Dialog'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open Dialog'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownButtonFormField<int?>));
+      await tester.pumpAndSettle();
+
+      final longItem = find.textContaining('Preparation 2').last;
+      await tester.tap(longItem);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('IssueDetailScreen shows info and handles delete', (tester) async {
