@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/project_model.dart';
+import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/project_repository.dart';
 import 'project_detail_screen.dart';
 import 'project_form_screen.dart';
@@ -8,8 +9,13 @@ import 'project_form_screen.dart';
 /// Main screen displaying the list of all projects with search & filtering.
 class ProjectListScreen extends StatefulWidget {
   final ProjectRepository? repository;
+  final MilestoneRepository? milestoneRepository;
 
-  const ProjectListScreen({super.key, this.repository});
+  const ProjectListScreen({
+    super.key,
+    this.repository,
+    this.milestoneRepository,
+  });
 
   @override
   State<ProjectListScreen> createState() => _ProjectListScreenState();
@@ -17,9 +23,11 @@ class ProjectListScreen extends StatefulWidget {
 
 class _ProjectListScreenState extends State<ProjectListScreen> {
   late final ProjectRepository _repository;
+  late final MilestoneRepository _milestoneRepository;
   final TextEditingController _searchController = TextEditingController();
 
   List<ProjectModel> _projects = [];
+  Map<int, MilestoneProgress> _progressMap = {};
   bool _isLoading = true;
   ProjectStatus? _selectedStatusFilter; // null means 'All'
 
@@ -27,6 +35,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
   void initState() {
     super.initState();
     _repository = widget.repository ?? ProjectRepository();
+    _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
     _loadProjects();
   }
 
@@ -54,9 +63,12 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
         list = await _repository.getAllProjects();
       }
 
+      final progressMap = await _milestoneRepository.getAllProjectsProgress();
+
       if (mounted) {
         setState(() {
           _projects = list;
+          _progressMap = progressMap;
           _isLoading = false;
         });
       }
@@ -220,6 +232,8 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
 
   Widget _buildProjectCard(ProjectModel project) {
     final statusColor = _getStatusColor(project.status);
+    final progress = _progressMap[project.id] ??
+        const MilestoneProgress(total: 0, completed: 0);
 
     return Card(
       child: InkWell(
@@ -229,7 +243,11 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ProjectDetailScreen(projectId: project.id!),
+                builder: (_) => ProjectDetailScreen(
+                  projectId: project.id!,
+                  repository: _repository,
+                  milestoneRepository: _milestoneRepository,
+                ),
               ),
             );
             _loadProjects();
@@ -293,17 +311,17 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     color: AppColors.secondaryText,
                   ),
                   const SizedBox(width: 4),
-                  const Text(
-                    '0 Tahapan',
-                    style: TextStyle(
+                  Text(
+                    '${progress.total} Tahapan',
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.secondaryText,
                     ),
                   ),
                   const Spacer(),
-                  const Text(
-                    '0% Selesai',
-                    style: TextStyle(
+                  Text(
+                    '${progress.percentageInt}% Selesai',
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: AppColors.secondaryText,

@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/project_model.dart';
+import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/project_repository.dart';
 import '../../widgets/confirm_delete_dialog.dart';
+import '../milestones/milestone_list_screen.dart';
 import 'project_form_screen.dart';
 
 /// Screen displaying the details and actions for a single project.
 class ProjectDetailScreen extends StatefulWidget {
   final int projectId;
   final ProjectRepository? repository;
+  final MilestoneRepository? milestoneRepository;
 
   const ProjectDetailScreen({
     super.key,
     required this.projectId,
     this.repository,
+    this.milestoneRepository,
   });
 
   @override
@@ -23,22 +27,31 @@ class ProjectDetailScreen extends StatefulWidget {
 
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late final ProjectRepository _repository;
+  late final MilestoneRepository _milestoneRepository;
+
   ProjectModel? _project;
+  MilestoneProgress _milestoneProgress =
+      const MilestoneProgress(total: 0, completed: 0);
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _repository = widget.repository ?? ProjectRepository();
+    _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
     _loadProject();
   }
 
   Future<void> _loadProject() async {
     setState(() => _isLoading = true);
     final project = await _repository.getProjectById(widget.projectId);
+    final progress =
+        await _milestoneRepository.getProjectProgress(widget.projectId);
+
     if (mounted) {
       setState(() {
         _project = project;
+        _milestoneProgress = progress;
         _isLoading = false;
       });
     }
@@ -165,12 +178,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   ),
                 ),
                 const Spacer(),
-                const Text(
-                  'Progres: 0%',
-                  style: TextStyle(
-                    color: AppColors.secondaryText,
+                Text(
+                  'Progres: ${_milestoneProgress.percentageInt}%',
+                  style: const TextStyle(
+                    color: AppColors.primaryAccent,
                     fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -178,13 +191,15 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
             const SizedBox(height: 12),
 
-            // Progress Bar (Placeholder 0% in Phase 2)
+            // Live Progress Bar from Milestones
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: const LinearProgressIndicator(
-                value: 0.0,
+              child: LinearProgressIndicator(
+                value: _milestoneProgress.ratio,
                 backgroundColor: AppColors.surfaceElevated,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryAccent),
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppColors.primaryAccent,
+                ),
                 minHeight: 6,
               ),
             ),
@@ -254,33 +269,70 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             ),
             const SizedBox(height: 8),
 
+            // 1. Milestones - Interactive Navigation
             _buildFeatureTile(
               icon: Icons.flag_outlined,
               title: 'Tahapan / Milestones',
-              subtitle: '0 Tahapan',
+              subtitle: _milestoneProgress.total == 0
+                  ? '0 Tahapan'
+                  : '${_milestoneProgress.total} Tahapan (${_milestoneProgress.completed} selesai)',
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MilestoneListScreen(
+                      projectId: project.id!,
+                      projectName: project.name,
+                      repository: _milestoneRepository,
+                    ),
+                  ),
+                );
+                _loadProject();
+              },
             ),
+
+            // 2. Ide & Gagasan (Phase 4)
             _buildFeatureTile(
               icon: Icons.lightbulb_outline,
               title: 'Ide & Gagasan',
               subtitle: '0 Ide',
+              onTap: () => _showComingSoon('Ide & Gagasan'),
             ),
+
+            // 3. Masalah & Kendala (Phase 4)
             _buildFeatureTile(
               icon: Icons.bug_report_outlined,
               title: 'Masalah & Kendala',
               subtitle: '0 Masalah',
+              onTap: () => _showComingSoon('Masalah & Kendala'),
             ),
+
+            // 4. Referensi Tautan (Phase 5)
             _buildFeatureTile(
               icon: Icons.link,
               title: 'Referensi Tautan',
               subtitle: '0 Referensi',
+              onTap: () => _showComingSoon('Referensi Tautan'),
             ),
+
+            // 5. Riwayat Aktivitas (Phase 6)
             _buildFeatureTile(
               icon: Icons.history,
               title: 'Riwayat Aktivitas',
               subtitle: 'Lihat riwayat perubahan',
+              onTap: () => _showComingSoon('Riwayat Aktivitas'),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showComingSoon(String moduleName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$moduleName akan tersedia pada fase berikutnya.'),
+        duration: const Duration(seconds: 1),
       ),
     );
   }
@@ -289,6 +341,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     required IconData icon,
     required String title,
     required String subtitle,
+    required VoidCallback onTap,
   }) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -307,14 +360,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         ),
         trailing:
             const Icon(Icons.chevron_right, color: AppColors.secondaryText),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('$title akan tersedia pada fase berikutnya.'),
-              duration: const Duration(seconds: 1),
-            ),
-          );
-        },
+        onTap: onTap,
       ),
     );
   }

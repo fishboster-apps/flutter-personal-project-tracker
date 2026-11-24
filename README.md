@@ -80,7 +80,7 @@ lib/
 |---|---|---|
 | Phase 1 | Project Foundation (setup, tema, database) | ✅ Selesai |
 | Phase 2 | Project Management (CRUD proyek) | ✅ Selesai |
-| Phase 3 | Milestone Management | 🔲 Belum Dimulai |
+| Phase 3 | Milestone Management | ✅ Selesai |
 | Phase 4 | Brainstorming & Issues | 🔲 Belum Dimulai |
 | Phase 5 | References | 🔲 Belum Dimulai |
 | Phase 6 | Activity Log | 🔲 Belum Dimulai |
@@ -96,6 +96,7 @@ lib/
 - [`docs/TODOLIST-PHASE-1.md`](docs/TODOLIST-PHASE-1.md) — Checklist Phase 1
 - [`docs/TODOLIST-PHASE-2.md`](docs/TODOLIST-PHASE-2.md) — Checklist Phase 2
 - [`docs/TODOLIST-PHASE-3.md`](docs/TODOLIST-PHASE-3.md) — Checklist Phase 3
+- [`docs/TODOLIST-PHASE-4.md`](docs/TODOLIST-PHASE-4.md) — Checklist Phase 4
 
 ---
 

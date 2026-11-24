@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_fishboster_personal_project_tracker/core/theme.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/models/milestone_model.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/project_model.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/repositories/milestone_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/project_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/projects/project_detail_screen.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/projects/project_form_screen.dart';
@@ -63,19 +65,36 @@ class FakeProjectRepository extends Fake implements ProjectRepository {
   }
 }
 
+class FakeMilestoneRepository extends Fake implements MilestoneRepository {
+  @override
+  Future<Map<int, MilestoneProgress>> getAllProjectsProgress() async => {};
+
+  @override
+  Future<MilestoneProgress> getProjectProgress(int projectId) async =>
+      const MilestoneProgress(total: 0, completed: 0);
+
+  @override
+  Future<List<MilestoneModel>> getMilestonesByProjectId(int projectId) async => [];
+}
+
 void main() {
   group('Presentation Layer Tests', () {
     late FakeProjectRepository repository;
+    late FakeMilestoneRepository milestoneRepository;
 
     setUp(() {
       repository = FakeProjectRepository();
+      milestoneRepository = FakeMilestoneRepository();
     });
 
     testWidgets('ProjectListScreen shows empty state initially', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
-          home: ProjectListScreen(repository: repository),
+          home: ProjectListScreen(
+            repository: repository,
+            milestoneRepository: milestoneRepository,
+          ),
         ),
       );
 
@@ -98,7 +117,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
-          home: ProjectListScreen(repository: repository),
+          home: ProjectListScreen(
+            repository: repository,
+            milestoneRepository: milestoneRepository,
+          ),
         ),
       );
 
@@ -177,6 +199,7 @@ void main() {
           home: ProjectDetailScreen(
             projectId: id,
             repository: repository,
+            milestoneRepository: milestoneRepository,
           ),
         ),
       );
