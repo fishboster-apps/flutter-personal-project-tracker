@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Release, Signing & Publishing Security
+.internal/
+docs/.internal/
+*.keystore
+*.jks
+key.properties
