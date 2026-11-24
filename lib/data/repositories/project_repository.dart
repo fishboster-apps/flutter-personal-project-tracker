@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart';
+
 import '../database/database_helper.dart';
 import '../database/migrations.dart';
 import '../models/project_model.dart';
@@ -14,10 +15,13 @@ class ProjectRepository {
     DatabaseHelper? dbHelper,
     Database? db,
     ActivityLogRepository? logRepository,
-  })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
-        _overrideDb = db,
-        _logRepo = logRepository ??
-            (db != null ? ActivityLogRepository(db: db) : ActivityLogRepository(dbHelper: dbHelper));
+  }) : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+       _overrideDb = db,
+       _logRepo =
+           logRepository ??
+           (db != null
+               ? ActivityLogRepository(db: db)
+               : ActivityLogRepository(dbHelper: dbHelper));
 
   Future<Database> get _db async => _overrideDb ?? await _dbHelper.database;
 

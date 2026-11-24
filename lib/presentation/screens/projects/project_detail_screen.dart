@@ -8,6 +8,7 @@ import '../../../data/repositories/issue_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/project_repository.dart';
 import '../../../data/repositories/reference_repository.dart';
+import '../../../services/copy_context_service.dart';
 import '../../widgets/confirm_delete_dialog.dart';
 import '../activity_logs/activity_log_screen.dart';
 import '../brainstorms/brainstorm_list_screen.dart';
@@ -25,6 +26,7 @@ class ProjectDetailScreen extends StatefulWidget {
   final IssueRepository? issueRepository;
   final ReferenceRepository? referenceRepository;
   final ActivityLogRepository? activityLogRepository;
+  final CopyContextService? copyContextService;
 
   const ProjectDetailScreen({
     super.key,
@@ -35,6 +37,7 @@ class ProjectDetailScreen extends StatefulWidget {
     this.issueRepository,
     this.referenceRepository,
     this.activityLogRepository,
+    this.copyContextService,
   });
 
   @override
@@ -48,6 +51,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late final IssueRepository _issueRepository;
   late final ReferenceRepository _referenceRepository;
   late final ActivityLogRepository _activityLogRepository;
+  late final CopyContextService _copyContextService;
 
   ProjectModel? _project;
   MilestoneProgress _milestoneProgress =
@@ -70,6 +74,14 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     _referenceRepository = widget.referenceRepository ?? ReferenceRepository();
     _activityLogRepository =
         widget.activityLogRepository ?? ActivityLogRepository();
+    _copyContextService = widget.copyContextService ??
+        CopyContextService(
+          projectRepository: _repository,
+          milestoneRepository: _milestoneRepository,
+          brainstormRepository: _brainstormRepository,
+          issueRepository: _issueRepository,
+          referenceRepository: _referenceRepository,
+        );
     _loadProject();
   }
 
@@ -120,6 +132,28 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         return AppColors.success;
       case ProjectStatus.archived:
         return AppColors.secondaryText;
+    }
+  }
+
+  Future<void> _copyProjectContext() async {
+    if (_project?.id == null) return;
+    try {
+      final contextText =
+          await _copyContextService.generateProjectContext(_project!.id!);
+      if (!mounted) return;
+      await _copyContextService.copyToClipboard(
+        context,
+        contextText,
+        successMessage: 'Konteks proyek berhasil disalin ke clipboard',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyalin konteks: $e'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -178,6 +212,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       appBar: AppBar(
         title: Text(project.name),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.copy_all_outlined),
+            tooltip: 'Salin Konteks Proyek',
+            onPressed: _copyProjectContext,
+          ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: 'Edit Proyek',

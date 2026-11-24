@@ -7,6 +7,7 @@ import '../../../data/models/milestone_model.dart';
 import '../../../data/repositories/brainstorm_repository.dart';
 import '../../../data/repositories/issue_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
+import '../../../services/copy_context_service.dart';
 import '../../widgets/confirm_delete_dialog.dart';
 import '../brainstorms/brainstorm_detail_screen.dart';
 import '../brainstorms/brainstorm_form_dialog.dart';
@@ -20,6 +21,7 @@ class MilestoneDetailScreen extends StatefulWidget {
   final MilestoneRepository? repository;
   final BrainstormRepository? brainstormRepository;
   final IssueRepository? issueRepository;
+  final CopyContextService? copyContextService;
 
   const MilestoneDetailScreen({
     super.key,
@@ -27,6 +29,7 @@ class MilestoneDetailScreen extends StatefulWidget {
     this.repository,
     this.brainstormRepository,
     this.issueRepository,
+    this.copyContextService,
   });
 
   @override
@@ -37,6 +40,7 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
   late final MilestoneRepository _repository;
   late final BrainstormRepository _brainstormRepository;
   late final IssueRepository _issueRepository;
+  late final CopyContextService _copyContextService;
 
   MilestoneModel? _milestone;
   List<BrainstormModel> _relatedBrainstorms = [];
@@ -49,6 +53,12 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
     _repository = widget.repository ?? MilestoneRepository();
     _brainstormRepository = widget.brainstormRepository ?? BrainstormRepository();
     _issueRepository = widget.issueRepository ?? IssueRepository();
+    _copyContextService = widget.copyContextService ??
+        CopyContextService(
+          milestoneRepository: _repository,
+          brainstormRepository: _brainstormRepository,
+          issueRepository: _issueRepository,
+        );
     _loadData();
   }
 
@@ -84,6 +94,28 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
     if (_milestone?.id == null) return;
     await _repository.toggleMilestoneCompletion(_milestone!.id!, value);
     _loadData();
+  }
+
+  Future<void> _copyMilestoneContext() async {
+    if (_milestone?.id == null) return;
+    try {
+      final contextText =
+          await _copyContextService.generateMilestoneContext(_milestone!.id!);
+      if (!mounted) return;
+      await _copyContextService.copyToClipboard(
+        context,
+        contextText,
+        successMessage: 'Konteks tahapan berhasil disalin ke clipboard',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyalin konteks: $e'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _confirmDelete() {
@@ -141,6 +173,11 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
       appBar: AppBar(
         title: Text(milestone.name),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.copy_all_outlined),
+            tooltip: 'Salin Konteks Tahapan',
+            onPressed: _copyMilestoneContext,
+          ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: 'Edit Tahapan',

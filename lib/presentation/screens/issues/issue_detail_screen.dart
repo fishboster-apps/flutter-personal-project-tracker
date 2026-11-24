@@ -7,6 +7,7 @@ import '../../../data/models/reference_model.dart';
 import '../../../data/repositories/issue_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/reference_repository.dart';
+import '../../../services/copy_context_service.dart';
 import '../../../services/url_launcher_service.dart';
 import '../../widgets/confirm_delete_dialog.dart';
 import '../references/reference_detail_screen.dart';
@@ -20,6 +21,7 @@ class IssueDetailScreen extends StatefulWidget {
   final MilestoneRepository? milestoneRepository;
   final ReferenceRepository? referenceRepository;
   final UrlLauncherService? launcherService;
+  final CopyContextService? copyContextService;
 
   const IssueDetailScreen({
     super.key,
@@ -28,6 +30,7 @@ class IssueDetailScreen extends StatefulWidget {
     this.milestoneRepository,
     this.referenceRepository,
     this.launcherService,
+    this.copyContextService,
   });
 
   @override
@@ -39,6 +42,7 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
   late final MilestoneRepository _milestoneRepository;
   late final ReferenceRepository _referenceRepository;
   late final UrlLauncherService _launcherService;
+  late final CopyContextService _copyContextService;
 
   IssueModel? _issue;
   MilestoneModel? _connectedMilestone;
@@ -52,6 +56,12 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
     _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
     _referenceRepository = widget.referenceRepository ?? ReferenceRepository();
     _launcherService = widget.launcherService ?? const UrlLauncherService();
+    _copyContextService = widget.copyContextService ??
+        CopyContextService(
+          issueRepository: _repository,
+          milestoneRepository: _milestoneRepository,
+          referenceRepository: _referenceRepository,
+        );
     _loadData();
   }
 
@@ -85,6 +95,28 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
     if (_issue?.id == null) return;
     await _repository.toggleIssueCompletion(_issue!.id!, isCompleted);
     _loadData();
+  }
+
+  Future<void> _copyIssueContext() async {
+    if (_issue?.id == null) return;
+    try {
+      final contextText =
+          await _copyContextService.generateIssueContext(_issue!.id!);
+      if (!mounted) return;
+      await _copyContextService.copyToClipboard(
+        context,
+        contextText,
+        successMessage: 'Konteks masalah berhasil disalin ke clipboard',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyalin konteks: $e'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _confirmDelete() {
@@ -142,6 +174,11 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
       appBar: AppBar(
         title: const Text('Detail Masalah & Kendala'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.copy_all_outlined),
+            tooltip: 'Salin Konteks Masalah',
+            onPressed: _copyIssueContext,
+          ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: 'Edit Masalah',

@@ -7,6 +7,7 @@ import '../../../data/models/reference_model.dart';
 import '../../../data/repositories/brainstorm_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/reference_repository.dart';
+import '../../../services/copy_context_service.dart';
 import '../../../services/url_launcher_service.dart';
 import '../../widgets/confirm_delete_dialog.dart';
 import '../references/reference_detail_screen.dart';
@@ -20,6 +21,7 @@ class BrainstormDetailScreen extends StatefulWidget {
   final MilestoneRepository? milestoneRepository;
   final ReferenceRepository? referenceRepository;
   final UrlLauncherService? launcherService;
+  final CopyContextService? copyContextService;
 
   const BrainstormDetailScreen({
     super.key,
@@ -28,6 +30,7 @@ class BrainstormDetailScreen extends StatefulWidget {
     this.milestoneRepository,
     this.referenceRepository,
     this.launcherService,
+    this.copyContextService,
   });
 
   @override
@@ -39,6 +42,7 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
   late final MilestoneRepository _milestoneRepository;
   late final ReferenceRepository _referenceRepository;
   late final UrlLauncherService _launcherService;
+  late final CopyContextService _copyContextService;
 
   BrainstormModel? _brainstorm;
   MilestoneModel? _connectedMilestone;
@@ -52,6 +56,12 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
     _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
     _referenceRepository = widget.referenceRepository ?? ReferenceRepository();
     _launcherService = widget.launcherService ?? const UrlLauncherService();
+    _copyContextService = widget.copyContextService ??
+        CopyContextService(
+          brainstormRepository: _repository,
+          milestoneRepository: _milestoneRepository,
+          referenceRepository: _referenceRepository,
+        );
     _loadData();
   }
 
@@ -85,6 +95,28 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
     if (_brainstorm?.id == null) return;
     await _repository.toggleBrainstormCompletion(_brainstorm!.id!, isCompleted);
     _loadData();
+  }
+
+  Future<void> _copyBrainstormContext() async {
+    if (_brainstorm?.id == null) return;
+    try {
+      final contextText =
+          await _copyContextService.generateBrainstormContext(_brainstorm!.id!);
+      if (!mounted) return;
+      await _copyContextService.copyToClipboard(
+        context,
+        contextText,
+        successMessage: 'Konteks ide berhasil disalin ke clipboard',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal menyalin konteks: $e'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   void _confirmDelete() {
@@ -142,6 +174,11 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
       appBar: AppBar(
         title: const Text('Detail Ide & Gagasan'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.copy_all_outlined),
+            tooltip: 'Salin Konteks Ide',
+            onPressed: _copyBrainstormContext,
+          ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: 'Edit Ide',
