@@ -79,7 +79,7 @@ lib/
 | Phase | Deskripsi | Status |
 |---|---|---|
 | Phase 1 | Project Foundation (setup, tema, database) | ✅ Selesai |
-| Phase 2 | Project Management (CRUD proyek) | 🔲 Belum Dimulai |
+| Phase 2 | Project Management (CRUD proyek) | ✅ Selesai |
 | Phase 3 | Milestone Management | 🔲 Belum Dimulai |
 | Phase 4 | Brainstorming & Issues | 🔲 Belum Dimulai |
 | Phase 5 | References | 🔲 Belum Dimulai |
@@ -95,6 +95,7 @@ lib/
 - [`docs/PRD.md`](docs/PRD.md) — Product Requirements Document
 - [`docs/TODOLIST-PHASE-1.md`](docs/TODOLIST-PHASE-1.md) — Checklist Phase 1
 - [`docs/TODOLIST-PHASE-2.md`](docs/TODOLIST-PHASE-2.md) — Checklist Phase 2
+- [`docs/TODOLIST-PHASE-3.md`](docs/TODOLIST-PHASE-3.md) — Checklist Phase 3
 
 ---
 
