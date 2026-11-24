@@ -4,9 +4,11 @@ import 'package:flutter_fishboster_personal_project_tracker/core/theme.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/brainstorm_model.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/issue_model.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/milestone_model.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/models/reference_model.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/brainstorm_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/issue_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/milestone_repository.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/repositories/reference_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/brainstorms/brainstorm_detail_screen.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/brainstorms/brainstorm_form_dialog.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/brainstorms/brainstorm_list_screen.dart';
@@ -170,16 +172,26 @@ class FakeMilestoneRepo extends Fake implements MilestoneRepository {
   }
 }
 
+class FakeReferenceRepo extends Fake implements ReferenceRepository {
+  @override
+  Future<List<ReferenceModel>> getReferencesByBrainstormId(int brainstormId) async => [];
+
+  @override
+  Future<List<ReferenceModel>> getReferencesByIssueId(int issueId) async => [];
+}
+
 void main() {
   group('Brainstorms & Issues Presentation Layer Tests', () {
     late FakeBrainstormRepo brainstormRepo;
     late FakeIssueRepo issueRepo;
     late FakeMilestoneRepo milestoneRepo;
+    late FakeReferenceRepo referenceRepo;
 
     setUp(() {
       brainstormRepo = FakeBrainstormRepo();
       issueRepo = FakeIssueRepo();
       milestoneRepo = FakeMilestoneRepo();
+      referenceRepo = FakeReferenceRepo();
 
       milestoneRepo.milestones.add(
         MilestoneModel(id: 10, projectId: 1, name: 'Sprint 1'),
@@ -304,6 +316,7 @@ void main() {
             brainstormId: id,
             repository: brainstormRepo,
             milestoneRepository: milestoneRepo,
+            referenceRepository: referenceRepo,
           ),
         ),
       );
@@ -444,6 +457,7 @@ void main() {
             issueId: id,
             repository: issueRepo,
             milestoneRepository: milestoneRepo,
+            referenceRepository: referenceRepo,
           ),
         ),
       );

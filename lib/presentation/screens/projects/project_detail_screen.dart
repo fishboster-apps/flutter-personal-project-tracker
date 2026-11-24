@@ -6,10 +6,12 @@ import '../../../data/repositories/brainstorm_repository.dart';
 import '../../../data/repositories/issue_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/project_repository.dart';
+import '../../../data/repositories/reference_repository.dart';
 import '../../widgets/confirm_delete_dialog.dart';
 import '../brainstorms/brainstorm_list_screen.dart';
 import '../issues/issue_list_screen.dart';
 import '../milestones/milestone_list_screen.dart';
+import '../references/reference_list_screen.dart';
 import 'project_form_screen.dart';
 
 /// Screen displaying the details and actions for a single project.
@@ -19,6 +21,7 @@ class ProjectDetailScreen extends StatefulWidget {
   final MilestoneRepository? milestoneRepository;
   final BrainstormRepository? brainstormRepository;
   final IssueRepository? issueRepository;
+  final ReferenceRepository? referenceRepository;
 
   const ProjectDetailScreen({
     super.key,
@@ -27,6 +30,7 @@ class ProjectDetailScreen extends StatefulWidget {
     this.milestoneRepository,
     this.brainstormRepository,
     this.issueRepository,
+    this.referenceRepository,
   });
 
   @override
@@ -38,6 +42,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late final MilestoneRepository _milestoneRepository;
   late final BrainstormRepository _brainstormRepository;
   late final IssueRepository _issueRepository;
+  late final ReferenceRepository _referenceRepository;
 
   ProjectModel? _project;
   MilestoneProgress _milestoneProgress =
@@ -46,6 +51,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       const ItemSummaryCount(total: 0, completed: 0);
   ItemSummaryCount _issueCount =
       const ItemSummaryCount(total: 0, completed: 0);
+  int _referenceCount = 0;
   bool _isLoading = true;
 
   @override
@@ -55,6 +61,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
     _brainstormRepository = widget.brainstormRepository ?? BrainstormRepository();
     _issueRepository = widget.issueRepository ?? IssueRepository();
+    _referenceRepository = widget.referenceRepository ?? ReferenceRepository();
     _loadProject();
   }
 
@@ -67,6 +74,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         await _brainstormRepository.getCountByProject(widget.projectId);
     final issueCount =
         await _issueRepository.getCountByProject(widget.projectId);
+    int referenceCount = 0;
+    try {
+      referenceCount =
+          await _referenceRepository.getReferenceCountByProject(widget.projectId);
+    } catch (_) {
+      // Keep 0 if failed
+    }
 
     if (mounted) {
       setState(() {
@@ -74,6 +88,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         _milestoneProgress = progress;
         _brainstormCount = brainstormCount;
         _issueCount = issueCount;
+        _referenceCount = referenceCount;
         _isLoading = false;
       });
     }
@@ -359,12 +374,26 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               },
             ),
 
-            // 4. Referensi Tautan (Phase 5)
+            // 4. Referensi Tautan (Phase 5 Active)
             _buildFeatureTile(
               icon: Icons.link,
               title: 'Referensi Tautan',
-              subtitle: '0 Referensi',
-              onTap: () => _showComingSoon('Referensi Tautan'),
+              subtitle: '$_referenceCount Referensi',
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ReferenceListScreen(
+                      projectId: project.id!,
+                      projectName: project.name,
+                      repository: _referenceRepository,
+                      brainstormRepository: _brainstormRepository,
+                      issueRepository: _issueRepository,
+                    ),
+                  ),
+                );
+                _loadProject();
+              },
             ),
 
             // 5. Riwayat Aktivitas (Phase 6)

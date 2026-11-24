@@ -7,6 +7,7 @@ import 'package:flutter_fishboster_personal_project_tracker/data/repositories/br
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/issue_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/milestone_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/project_repository.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/repositories/reference_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/projects/project_detail_screen.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/projects/project_form_screen.dart';
 import 'package:flutter_fishboster_personal_project_tracker/presentation/screens/projects/project_list_screen.dart';
@@ -91,18 +92,25 @@ class FakeIssueRepository extends Fake implements IssueRepository {
       const ItemSummaryCount(total: 0, completed: 0);
 }
 
+class FakeReferenceRepository extends Fake implements ReferenceRepository {
+  @override
+  Future<int> getReferenceCountByProject(int projectId) async => 0;
+}
+
 void main() {
   group('Presentation Layer Tests', () {
     late FakeProjectRepository repository;
     late FakeMilestoneRepository milestoneRepository;
     late FakeBrainstormRepository brainstormRepository;
     late FakeIssueRepository issueRepository;
+    late FakeReferenceRepository referenceRepository;
 
     setUp(() {
       repository = FakeProjectRepository();
       milestoneRepository = FakeMilestoneRepository();
       brainstormRepository = FakeBrainstormRepository();
       issueRepository = FakeIssueRepository();
+      referenceRepository = FakeReferenceRepository();
     });
 
     testWidgets('ProjectListScreen shows empty state initially', (tester) async {
@@ -220,6 +228,7 @@ void main() {
             milestoneRepository: milestoneRepository,
             brainstormRepository: brainstormRepository,
             issueRepository: issueRepository,
+            referenceRepository: referenceRepository,
           ),
         ),
       );

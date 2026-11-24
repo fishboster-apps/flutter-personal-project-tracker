@@ -3,9 +3,14 @@ import 'package:intl/intl.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/brainstorm_model.dart';
 import '../../../data/models/milestone_model.dart';
+import '../../../data/models/reference_model.dart';
 import '../../../data/repositories/brainstorm_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
+import '../../../data/repositories/reference_repository.dart';
+import '../../../services/url_launcher_service.dart';
 import '../../widgets/confirm_delete_dialog.dart';
+import '../references/reference_detail_screen.dart';
+import '../references/reference_form_dialog.dart';
 import 'brainstorm_form_dialog.dart';
 
 /// Screen displaying the details and actions of a single Brainstorm idea.
@@ -13,12 +18,16 @@ class BrainstormDetailScreen extends StatefulWidget {
   final int brainstormId;
   final BrainstormRepository? repository;
   final MilestoneRepository? milestoneRepository;
+  final ReferenceRepository? referenceRepository;
+  final UrlLauncherService? launcherService;
 
   const BrainstormDetailScreen({
     super.key,
     required this.brainstormId,
     this.repository,
     this.milestoneRepository,
+    this.referenceRepository,
+    this.launcherService,
   });
 
   @override
@@ -28,9 +37,12 @@ class BrainstormDetailScreen extends StatefulWidget {
 class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
   late final BrainstormRepository _repository;
   late final MilestoneRepository _milestoneRepository;
+  late final ReferenceRepository _referenceRepository;
+  late final UrlLauncherService _launcherService;
 
   BrainstormModel? _brainstorm;
   MilestoneModel? _connectedMilestone;
+  List<ReferenceModel> _references = [];
   bool _isLoading = true;
 
   @override
@@ -38,6 +50,8 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
     super.initState();
     _repository = widget.repository ?? BrainstormRepository();
     _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
+    _referenceRepository = widget.referenceRepository ?? ReferenceRepository();
+    _launcherService = widget.launcherService ?? const UrlLauncherService();
     _loadData();
   }
 
@@ -50,10 +64,18 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
       milestone = await _milestoneRepository.getMilestoneById(brainstorm!.milestoneId!);
     }
 
+    List<ReferenceModel> references = [];
+    try {
+      references = await _referenceRepository.getReferencesByBrainstormId(widget.brainstormId);
+    } catch (_) {
+      // Keep empty if failed
+    }
+
     if (mounted) {
       setState(() {
         _brainstorm = brainstorm;
         _connectedMilestone = milestone;
+        _references = references;
         _isLoading = false;
       });
     }
@@ -95,14 +117,16 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        appBar: AppBar(title: const Text('Detail Ide & Gagasan')),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    if (_brainstorm == null) {
+    final idea = _brainstorm;
+    if (idea == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Detail Ide')),
+        appBar: AppBar(title: const Text('Detail Ide & Gagasan')),
         body: const Center(
           child: Text(
             'Ide tidak ditemukan',
@@ -112,12 +136,11 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
       );
     }
 
-    final idea = _brainstorm!;
     final dateFormat = DateFormat('dd MMM yyyy, HH:mm');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(idea.title),
+        title: const Text('Detail Ide & Gagasan'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
@@ -142,11 +165,21 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: RefreshIndicator(
+        onRefresh: _loadData,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
           children: [
+            // Title & Status
+            Text(
+              idea.title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryText,
+                  ),
+            ),
+            const SizedBox(height: 12),
+
             // Status and Completion Toggle Card
             Card(
               child: Padding(
@@ -227,6 +260,59 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
               const SizedBox(height: 16),
             ],
 
+            // Referensi Terkait Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Referensi Terkait (${_references.length})',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppColors.secondaryText,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    final added = await ReferenceFormDialog.show(
+                      context,
+                      projectId: idea.projectId,
+                      initialBrainstormId: idea.id,
+                      repository: _referenceRepository,
+                      brainstormRepository: _repository,
+                    );
+                    if (added == true) {
+                      _loadData();
+                    }
+                  },
+                  icon: const Icon(Icons.add, size: 16),
+                  label: const Text('Tambah Tautan'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primaryAccent,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            if (_references.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Text(
+                  'Belum ada referensi tautan untuk ide ini.',
+                  style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                ),
+              )
+            else
+              ..._references.map((ref) => _buildReferenceItem(ref)),
+
+            const SizedBox(height: 16),
+
             // Metadata: Created & Updated
             Row(
               children: [
@@ -247,6 +333,57 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildReferenceItem(ReferenceModel ref) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      color: AppColors.surface,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        title: Text(
+          ref.title,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primaryText),
+        ),
+        subtitle: Text(
+          ref.url,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 12, color: AppColors.primaryAccent),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.copy, size: 16, color: AppColors.secondaryText),
+              tooltip: 'Salin',
+              onPressed: () => UrlLauncherService.copyToClipboard(ref.url, context: context),
+            ),
+            IconButton(
+              icon: const Icon(Icons.open_in_new, size: 16, color: AppColors.primaryAccent),
+              tooltip: 'Buka',
+              onPressed: () => _launcherService.openUrl(ref.url, context: context),
+            ),
+          ],
+        ),
+        onTap: () async {
+          final deleted = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ReferenceDetailScreen(
+                referenceId: ref.id!,
+                repository: _referenceRepository,
+                brainstormRepository: _repository,
+                launcherService: _launcherService,
+              ),
+            ),
+          );
+          if (deleted == true || mounted) {
+            _loadData();
+          }
+        },
       ),
     );
   }
