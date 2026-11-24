@@ -2,8 +2,9 @@ import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 import '../database/migrations.dart';
 import '../models/brainstorm_model.dart';
+import 'activity_log_repository.dart';
 
-/// Summary count representing total and completed items.
+/// Aggregation summary for counts.
 class ItemSummaryCount {
   final int total;
   final int completed;
@@ -17,20 +18,38 @@ class ItemSummaryCount {
 class BrainstormRepository {
   final DatabaseHelper _dbHelper;
   final Database? _overrideDb;
+  final ActivityLogRepository? _logRepo;
 
-  BrainstormRepository({DatabaseHelper? dbHelper, Database? db})
-      : _dbHelper = dbHelper ?? DatabaseHelper.instance,
-        _overrideDb = db;
+  BrainstormRepository({
+    DatabaseHelper? dbHelper,
+    Database? db,
+    ActivityLogRepository? logRepository,
+  })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+        _overrideDb = db,
+        _logRepo = logRepository ??
+            (db != null ? ActivityLogRepository(db: db) : ActivityLogRepository(dbHelper: dbHelper));
 
   Future<Database> get _db async => _overrideDb ?? await _dbHelper.database;
 
   /// Inserts a new brainstorm idea.
   Future<int> insertBrainstorm(BrainstormModel brainstorm) async {
     final db = await _db;
-    return await db.insert(
+    final id = await db.insert(
       DatabaseMigrations.tableBrainstorms,
       brainstorm.toMap(),
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: brainstorm.projectId,
+        entityType: 'brainstorm',
+        action: 'create',
+        description: 'Menambahkan ide "${brainstorm.title}"',
+        entityId: id,
+      );
+    } catch (_) {}
+
+    return id;
   }
 
   /// Retrieves brainstorms for a project with optional filtering.
@@ -80,28 +99,55 @@ class BrainstormRepository {
     if (brainstorm.id == null) {
       throw ArgumentError('Cannot update brainstorm without an id.');
     }
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableBrainstorms,
       brainstorm.toMap(),
       where: 'id = ?',
       whereArgs: [brainstorm.id],
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: brainstorm.projectId,
+        entityType: 'brainstorm',
+        action: 'update',
+        description: 'Memperbarui ide "${brainstorm.title}"',
+        entityId: brainstorm.id,
+      );
+    } catch (_) {}
+
+    return rows;
   }
 
   /// Deletes a brainstorm idea by [id].
   Future<int> deleteBrainstorm(int id) async {
+    final item = await getBrainstormById(id);
     final db = await _db;
-    return await db.delete(
+    final rows = await db.delete(
       DatabaseMigrations.tableBrainstorms,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (item != null) {
+      try {
+        await _logRepo?.log(
+          projectId: item.projectId,
+          entityType: 'brainstorm',
+          action: 'delete',
+          description: 'Menghapus ide "${item.title}"',
+        );
+      } catch (_) {}
+    }
+
+    return rows;
   }
 
   /// Toggles the completion checkbox status of a brainstorm idea.
   Future<int> toggleBrainstormCompletion(int id, bool isCompleted) async {
+    final item = await getBrainstormById(id);
     final db = await _db;
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableBrainstorms,
       {
         'is_completed': isCompleted ? 1 : 0,
@@ -110,6 +156,22 @@ class BrainstormRepository {
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (item != null) {
+      try {
+        await _logRepo?.log(
+          projectId: item.projectId,
+          entityType: 'brainstorm',
+          action: 'complete',
+          description: isCompleted
+              ? 'Menyelesaikan ide "${item.title}"'
+              : 'Menandai ide "${item.title}" belum selesai',
+          entityId: id,
+        );
+      } catch (_) {}
+    }
+
+    return rows;
   }
 
   /// Calculates total and completed brainstorm ideas for a project.

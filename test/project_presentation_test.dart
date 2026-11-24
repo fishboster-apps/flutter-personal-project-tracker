@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_fishboster_personal_project_tracker/core/theme.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/models/activity_log_model.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/milestone_model.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/models/project_model.dart';
+import 'package:flutter_fishboster_personal_project_tracker/data/repositories/activity_log_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/brainstorm_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/issue_repository.dart';
 import 'package:flutter_fishboster_personal_project_tracker/data/repositories/milestone_repository.dart';
@@ -97,6 +99,14 @@ class FakeReferenceRepository extends Fake implements ReferenceRepository {
   Future<int> getReferenceCountByProject(int projectId) async => 0;
 }
 
+class FakeActivityLogRepository extends Fake implements ActivityLogRepository {
+  @override
+  Future<int> getLogCountByProject(int projectId) async => 0;
+
+  @override
+  Future<List<ActivityLogModel>> getLogsByProjectId(int projectId, {String? entityType, int limit = 100}) async => [];
+}
+
 void main() {
   group('Presentation Layer Tests', () {
     late FakeProjectRepository repository;
@@ -104,6 +114,7 @@ void main() {
     late FakeBrainstormRepository brainstormRepository;
     late FakeIssueRepository issueRepository;
     late FakeReferenceRepository referenceRepository;
+    late FakeActivityLogRepository activityLogRepository;
 
     setUp(() {
       repository = FakeProjectRepository();
@@ -111,6 +122,7 @@ void main() {
       brainstormRepository = FakeBrainstormRepository();
       issueRepository = FakeIssueRepository();
       referenceRepository = FakeReferenceRepository();
+      activityLogRepository = FakeActivityLogRepository();
     });
 
     testWidgets('ProjectListScreen shows empty state initially', (tester) async {
@@ -229,6 +241,7 @@ void main() {
             brainstormRepository: brainstormRepository,
             issueRepository: issueRepository,
             referenceRepository: referenceRepository,
+            activityLogRepository: activityLogRepository,
           ),
         ),
       );

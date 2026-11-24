@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme.dart';
 import '../../../data/models/project_model.dart';
+import '../../../data/repositories/activity_log_repository.dart';
 import '../../../data/repositories/brainstorm_repository.dart';
 import '../../../data/repositories/issue_repository.dart';
 import '../../../data/repositories/milestone_repository.dart';
 import '../../../data/repositories/project_repository.dart';
 import '../../../data/repositories/reference_repository.dart';
 import '../../widgets/confirm_delete_dialog.dart';
+import '../activity_logs/activity_log_screen.dart';
 import '../brainstorms/brainstorm_list_screen.dart';
 import '../issues/issue_list_screen.dart';
 import '../milestones/milestone_list_screen.dart';
@@ -22,6 +24,7 @@ class ProjectDetailScreen extends StatefulWidget {
   final BrainstormRepository? brainstormRepository;
   final IssueRepository? issueRepository;
   final ReferenceRepository? referenceRepository;
+  final ActivityLogRepository? activityLogRepository;
 
   const ProjectDetailScreen({
     super.key,
@@ -31,6 +34,7 @@ class ProjectDetailScreen extends StatefulWidget {
     this.brainstormRepository,
     this.issueRepository,
     this.referenceRepository,
+    this.activityLogRepository,
   });
 
   @override
@@ -43,6 +47,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late final BrainstormRepository _brainstormRepository;
   late final IssueRepository _issueRepository;
   late final ReferenceRepository _referenceRepository;
+  late final ActivityLogRepository _activityLogRepository;
 
   ProjectModel? _project;
   MilestoneProgress _milestoneProgress =
@@ -52,6 +57,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   ItemSummaryCount _issueCount =
       const ItemSummaryCount(total: 0, completed: 0);
   int _referenceCount = 0;
+  int _activityLogCount = 0;
   bool _isLoading = true;
 
   @override
@@ -62,6 +68,8 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     _brainstormRepository = widget.brainstormRepository ?? BrainstormRepository();
     _issueRepository = widget.issueRepository ?? IssueRepository();
     _referenceRepository = widget.referenceRepository ?? ReferenceRepository();
+    _activityLogRepository =
+        widget.activityLogRepository ?? ActivityLogRepository();
     _loadProject();
   }
 
@@ -81,6 +89,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     } catch (_) {
       // Keep 0 if failed
     }
+    int activityLogCount = 0;
+    try {
+      activityLogCount =
+          await _activityLogRepository.getLogCountByProject(widget.projectId);
+    } catch (_) {
+      // Keep 0 if failed
+    }
 
     if (mounted) {
       setState(() {
@@ -89,6 +104,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         _brainstormCount = brainstormCount;
         _issueCount = issueCount;
         _referenceCount = referenceCount;
+        _activityLogCount = activityLogCount;
         _isLoading = false;
       });
     }
@@ -396,24 +412,27 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               },
             ),
 
-            // 5. Riwayat Aktivitas (Phase 6)
+            // 5. Riwayat Aktivitas (Phase 6 Active)
             _buildFeatureTile(
               icon: Icons.history,
               title: 'Riwayat Aktivitas',
-              subtitle: 'Lihat riwayat perubahan',
-              onTap: () => _showComingSoon('Riwayat Aktivitas'),
+              subtitle: '$_activityLogCount Aktivitas',
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ActivityLogScreen(
+                      projectId: project.id!,
+                      projectName: project.name,
+                      repository: _activityLogRepository,
+                    ),
+                  ),
+                );
+                _loadProject();
+              },
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showComingSoon(String moduleName) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$moduleName akan tersedia pada fase berikutnya.'),
-        duration: const Duration(seconds: 1),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 import '../database/migrations.dart';
 import '../models/milestone_model.dart';
+import 'activity_log_repository.dart';
 
 /// Aggregation data for project milestones progress.
 class MilestoneProgress {
@@ -22,10 +23,16 @@ class MilestoneProgress {
 class MilestoneRepository {
   final DatabaseHelper _dbHelper;
   final Database? _overrideDb;
+  final ActivityLogRepository? _logRepo;
 
-  MilestoneRepository({DatabaseHelper? dbHelper, Database? db})
-      : _dbHelper = dbHelper ?? DatabaseHelper.instance,
-        _overrideDb = db;
+  MilestoneRepository({
+    DatabaseHelper? dbHelper,
+    Database? db,
+    ActivityLogRepository? logRepository,
+  })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+        _overrideDb = db,
+        _logRepo = logRepository ??
+            (db != null ? ActivityLogRepository(db: db) : ActivityLogRepository(dbHelper: dbHelper));
 
   Future<Database> get _db async => _overrideDb ?? await _dbHelper.database;
 
@@ -45,10 +52,22 @@ class MilestoneRepository {
     }
 
     final toInsert = milestone.copyWith(sortOrder: sortOrder);
-    return await db.insert(
+    final id = await db.insert(
       DatabaseMigrations.tableMilestones,
       toInsert.toMap(),
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: toInsert.projectId,
+        entityType: 'milestone',
+        action: 'create',
+        description: 'Menambahkan tahapan "${toInsert.name}"',
+        entityId: id,
+      );
+    } catch (_) {}
+
+    return id;
   }
 
   /// Retrieves all milestones for a project ordered by [sort_order] ascending.
@@ -82,29 +101,56 @@ class MilestoneRepository {
     if (milestone.id == null) {
       throw ArgumentError('Cannot update milestone without an id.');
     }
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableMilestones,
       milestone.toMap(),
       where: 'id = ?',
       whereArgs: [milestone.id],
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: milestone.projectId,
+        entityType: 'milestone',
+        action: 'update',
+        description: 'Memperbarui tahapan "${milestone.name}"',
+        entityId: milestone.id,
+      );
+    } catch (_) {}
+
+    return rows;
   }
 
   /// Deletes a milestone by [id].
   /// Child brainstorms and issues will have milestone_id SET NULL via FK rules.
   Future<int> deleteMilestone(int id) async {
+    final milestone = await getMilestoneById(id);
     final db = await _db;
-    return await db.delete(
+    final rows = await db.delete(
       DatabaseMigrations.tableMilestones,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (milestone != null) {
+      try {
+        await _logRepo?.log(
+          projectId: milestone.projectId,
+          entityType: 'milestone',
+          action: 'delete',
+          description: 'Menghapus tahapan "${milestone.name}"',
+        );
+      } catch (_) {}
+    }
+
+    return rows;
   }
 
   /// Toggles the completion checkbox status of a milestone.
   Future<int> toggleMilestoneCompletion(int id, bool isCompleted) async {
+    final milestone = await getMilestoneById(id);
     final db = await _db;
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableMilestones,
       {
         'is_completed': isCompleted ? 1 : 0,
@@ -113,6 +159,22 @@ class MilestoneRepository {
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (milestone != null) {
+      try {
+        await _logRepo?.log(
+          projectId: milestone.projectId,
+          entityType: 'milestone',
+          action: 'complete',
+          description: isCompleted
+              ? 'Menyelesaikan tahapan "${milestone.name}"'
+              : 'Menandai tahapan "${milestone.name}" belum selesai',
+          entityId: id,
+        );
+      } catch (_) {}
+    }
+
+    return rows;
   }
 
   /// Reorders milestones for a project in a single transaction.
@@ -136,6 +198,15 @@ class MilestoneRepository {
         );
       }
     });
+
+    try {
+      await _logRepo?.log(
+        projectId: projectId,
+        entityType: 'milestone',
+        action: 'reorder',
+        description: 'Mengubah urutan tahapan proyek',
+      );
+    } catch (_) {}
   }
 
   /// Calculates total milestones, completed milestones, and completion percentage for a project.

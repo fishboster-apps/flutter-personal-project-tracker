@@ -2,26 +2,45 @@ import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 import '../database/migrations.dart';
 import '../models/issue_model.dart';
+import 'activity_log_repository.dart';
 import 'brainstorm_repository.dart';
 
 /// Repository handling all database operations for Issues (Problems & Bugs).
 class IssueRepository {
   final DatabaseHelper _dbHelper;
   final Database? _overrideDb;
+  final ActivityLogRepository? _logRepo;
 
-  IssueRepository({DatabaseHelper? dbHelper, Database? db})
-      : _dbHelper = dbHelper ?? DatabaseHelper.instance,
-        _overrideDb = db;
+  IssueRepository({
+    DatabaseHelper? dbHelper,
+    Database? db,
+    ActivityLogRepository? logRepository,
+  })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+        _overrideDb = db,
+        _logRepo = logRepository ??
+            (db != null ? ActivityLogRepository(db: db) : ActivityLogRepository(dbHelper: dbHelper));
 
   Future<Database> get _db async => _overrideDb ?? await _dbHelper.database;
 
   /// Inserts a new issue.
   Future<int> insertIssue(IssueModel issue) async {
     final db = await _db;
-    return await db.insert(
+    final id = await db.insert(
       DatabaseMigrations.tableIssues,
       issue.toMap(),
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: issue.projectId,
+        entityType: 'issue',
+        action: 'create',
+        description: 'Mencatat kendala "${issue.title}"',
+        entityId: id,
+      );
+    } catch (_) {}
+
+    return id;
   }
 
   /// Retrieves issues for a project with optional filtering.
@@ -71,28 +90,55 @@ class IssueRepository {
     if (issue.id == null) {
       throw ArgumentError('Cannot update issue without an id.');
     }
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableIssues,
       issue.toMap(),
       where: 'id = ?',
       whereArgs: [issue.id],
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: issue.projectId,
+        entityType: 'issue',
+        action: 'update',
+        description: 'Memperbarui kendala "${issue.title}"',
+        entityId: issue.id,
+      );
+    } catch (_) {}
+
+    return rows;
   }
 
   /// Deletes an issue by [id].
   Future<int> deleteIssue(int id) async {
+    final item = await getIssueById(id);
     final db = await _db;
-    return await db.delete(
+    final rows = await db.delete(
       DatabaseMigrations.tableIssues,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (item != null) {
+      try {
+        await _logRepo?.log(
+          projectId: item.projectId,
+          entityType: 'issue',
+          action: 'delete',
+          description: 'Menghapus kendala "${item.title}"',
+        );
+      } catch (_) {}
+    }
+
+    return rows;
   }
 
   /// Toggles the completion checkbox status of an issue.
   Future<int> toggleIssueCompletion(int id, bool isCompleted) async {
+    final item = await getIssueById(id);
     final db = await _db;
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableIssues,
       {
         'is_completed': isCompleted ? 1 : 0,
@@ -101,6 +147,22 @@ class IssueRepository {
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (item != null) {
+      try {
+        await _logRepo?.log(
+          projectId: item.projectId,
+          entityType: 'issue',
+          action: 'complete',
+          description: isCompleted
+              ? 'Menandai kendala "${item.title}" selesai/teratasi'
+              : 'Membuka kembali kendala "${item.title}"',
+          entityId: id,
+        );
+      } catch (_) {}
+    }
+
+    return rows;
   }
 
   /// Calculates total and completed issues for a project.

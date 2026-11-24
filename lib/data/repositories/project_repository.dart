@@ -2,25 +2,44 @@ import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 import '../database/migrations.dart';
 import '../models/project_model.dart';
+import 'activity_log_repository.dart';
 
 /// Repository handling all database operations for Projects.
 class ProjectRepository {
   final DatabaseHelper _dbHelper;
   final Database? _overrideDb;
+  final ActivityLogRepository? _logRepo;
 
-  ProjectRepository({DatabaseHelper? dbHelper, Database? db})
-      : _dbHelper = dbHelper ?? DatabaseHelper.instance,
-        _overrideDb = db;
+  ProjectRepository({
+    DatabaseHelper? dbHelper,
+    Database? db,
+    ActivityLogRepository? logRepository,
+  })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+        _overrideDb = db,
+        _logRepo = logRepository ??
+            (db != null ? ActivityLogRepository(db: db) : ActivityLogRepository(dbHelper: dbHelper));
 
   Future<Database> get _db async => _overrideDb ?? await _dbHelper.database;
 
   /// Inserts a new project and returns the generated primary key [id].
   Future<int> insertProject(ProjectModel project) async {
     final db = await _db;
-    return await db.insert(
+    final id = await db.insert(
       DatabaseMigrations.tableProjects,
       project.toMap(),
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: id,
+        entityType: 'project',
+        action: 'create',
+        description: 'Membuat proyek "${project.name}"',
+        entityId: id,
+      );
+    } catch (_) {}
+
+    return id;
   }
 
   /// Retrieves all projects ordered by updated date descending.
@@ -52,12 +71,24 @@ class ProjectRepository {
     if (project.id == null) {
       throw ArgumentError('Cannot update project without an id.');
     }
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableProjects,
       project.toMap(),
       where: 'id = ?',
       whereArgs: [project.id],
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: project.id!,
+        entityType: 'project',
+        action: 'update',
+        description: 'Memperbarui informasi proyek "${project.name}"',
+        entityId: project.id,
+      );
+    } catch (_) {}
+
+    return rows;
   }
 
   /// Deletes a project by [id]. Cascading will remove child records.

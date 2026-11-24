@@ -2,25 +2,44 @@ import 'package:sqflite/sqflite.dart';
 import '../database/database_helper.dart';
 import '../database/migrations.dart';
 import '../models/reference_model.dart';
+import 'activity_log_repository.dart';
 
 /// Repository for handling CRUD and queries for Project References.
 class ReferenceRepository {
   final DatabaseHelper _dbHelper;
   final Database? _overrideDb;
+  final ActivityLogRepository? _logRepo;
 
-  ReferenceRepository({DatabaseHelper? dbHelper, Database? db})
-      : _dbHelper = dbHelper ?? DatabaseHelper.instance,
-        _overrideDb = db;
+  ReferenceRepository({
+    DatabaseHelper? dbHelper,
+    Database? db,
+    ActivityLogRepository? logRepository,
+  })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+        _overrideDb = db,
+        _logRepo = logRepository ??
+            (db != null ? ActivityLogRepository(db: db) : ActivityLogRepository(dbHelper: dbHelper));
 
   Future<Database> get _db async => _overrideDb ?? await _dbHelper.database;
 
   /// Inserts a new reference item.
   Future<int> insertReference(ReferenceModel reference) async {
     final db = await _db;
-    return await db.insert(
+    final id = await db.insert(
       DatabaseMigrations.tableReferences,
       reference.toMap(),
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: reference.projectId,
+        entityType: 'reference',
+        action: 'create',
+        description: 'Menambahkan referensi "${reference.title}"',
+        entityId: id,
+      );
+    } catch (_) {}
+
+    return id;
   }
 
   /// Retrieves references for a project with optional filters.
@@ -101,22 +120,48 @@ class ReferenceRepository {
     if (reference.id == null) return 0;
     final db = await _db;
     final updated = reference.copyWith(updatedAt: DateTime.now());
-    return await db.update(
+    final rows = await db.update(
       DatabaseMigrations.tableReferences,
       updated.toMap(),
       where: 'id = ?',
       whereArgs: [reference.id],
     );
+
+    try {
+      await _logRepo?.log(
+        projectId: reference.projectId,
+        entityType: 'reference',
+        action: 'update',
+        description: 'Memperbarui referensi "${reference.title}"',
+        entityId: reference.id,
+      );
+    } catch (_) {}
+
+    return rows;
   }
 
   /// Deletes a reference by its [id].
   Future<int> deleteReference(int id) async {
+    final item = await getReferenceById(id);
     final db = await _db;
-    return await db.delete(
+    final rows = await db.delete(
       DatabaseMigrations.tableReferences,
       where: 'id = ?',
       whereArgs: [id],
     );
+
+    if (item != null) {
+      try {
+        await _logRepo?.log(
+          projectId: item.projectId,
+          entityType: 'reference',
+          action: 'delete',
+          description: 'Menghapus referensi "${item.title}"',
+        );
+      } catch (_) {}
+    }
+
+    return rows;
   }
 
   /// Returns total count of references for a given [projectId].
