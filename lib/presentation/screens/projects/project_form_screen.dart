@@ -125,10 +125,10 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
             children: [
               TextFormField(
                 controller: _nameController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Nama Proyek *',
                   hintText: 'Contoh: E-Commerce Mobile App',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -141,10 +141,10 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _descController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Deskripsi Proyek',
                   hintText: 'Tujuan, ruang lingkup, atau catatan proyek',
-                  border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
                 maxLines: 4,
@@ -155,12 +155,14 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                 initialValue: _selectedStatus,
                 decoration: const InputDecoration(
                   labelText: 'Status Proyek',
-                  border: OutlineInputBorder(),
                 ),
                 items: ProjectStatus.values.map((status) {
                   return DropdownMenuItem(
                     value: status,
-                    child: Text(status.label),
+                    child: Text(
+                      status.label,
+                      style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
+                    ),
                   );
                 }).toList(),
                 onChanged: (newStatus) {
@@ -175,12 +177,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                 child: FilledButton(
                   onPressed: _isLoading ? null : _saveProject,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primaryAccent,
-                    foregroundColor: AppColors.background,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
                   ),
                   child: _isLoading
                       ? const SizedBox(
@@ -190,7 +187,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                         )
                       : Text(
                           isEdit ? 'Perbarui Proyek' : 'Simpan Proyek',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                         ),
                 ),
               ),

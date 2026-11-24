@@ -123,7 +123,7 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
       context,
       title: 'Hapus Tahapan',
       message:
-          'Apakah Anda yakin ingin menghapus tahapan "${_milestone?.name}"? Ide dan masalah terkait akan tetap tersimpan.',
+          'Yakin ingin menghapus tahapan "${_milestone?.name}"? Ide dan masalah terkait akan tetap tersimpan.',
       confirmLabel: 'Hapus Tahapan',
       onConfirm: () async {
         if (_milestone?.id != null) {
@@ -233,14 +233,14 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
                                   ? AppColors.success
                                   : AppColors.warning,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 12,
                             ),
                           ),
                           Text(
                             'Urutan #${milestone.sortOrder + 1}',
                             style: const TextStyle(
                               color: AppColors.secondaryText,
-                              fontSize: 12,
+                              fontSize: 10,
                             ),
                           ),
                         ],
@@ -275,7 +275,7 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
                   milestone.description,
                   style: const TextStyle(
                     color: AppColors.primaryText,
-                    fontSize: 14,
+                    fontSize: 12,
                     height: 1.4,
                   ),
                 ),
@@ -296,7 +296,7 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
                   'Dibuat: ${dateFormat.format(milestone.createdAt)}',
                   style: const TextStyle(
                     color: AppColors.secondaryText,
-                    fontSize: 12,
+                    fontSize: 10,
                   ),
                 ),
               ],
@@ -341,7 +341,7 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
                   'Belum ada ide yang terhubung ke tahapan ini.',
-                  style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                  style: TextStyle(color: AppColors.secondaryText, fontSize: 12),
                 ),
               )
             else
@@ -436,7 +436,7 @@ class _MilestoneDetailScreenState extends State<MilestoneDetailScreen> {
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
                   'Belum ada kendala atau masalah di tahapan ini.',
-                  style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                  style: TextStyle(color: AppColors.secondaryText, fontSize: 12),
                 ),
               )
             else

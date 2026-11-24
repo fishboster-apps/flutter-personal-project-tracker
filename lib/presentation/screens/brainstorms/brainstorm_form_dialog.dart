@@ -155,7 +155,7 @@ class _BrainstormFormDialogState extends State<BrainstormFormDialog> {
         style: const TextStyle(
           color: AppColors.primaryText,
           fontWeight: FontWeight.bold,
-          fontSize: 18,
+          fontSize: 15,
         ),
       ),
       content: SingleChildScrollView(
@@ -167,10 +167,10 @@ class _BrainstormFormDialogState extends State<BrainstormFormDialog> {
             children: [
               TextFormField(
                 controller: _titleController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Judul Ide *',
                   hintText: 'Contoh: Integrasi Google OAuth',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -183,10 +183,10 @@ class _BrainstormFormDialogState extends State<BrainstormFormDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _descController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Deskripsi Ide',
                   hintText: 'Catatan detail atau konsep ide ini',
-                  border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
                 maxLines: 3,
@@ -197,12 +197,14 @@ class _BrainstormFormDialogState extends State<BrainstormFormDialog> {
                 initialValue: _selectedMilestoneId,
                 decoration: const InputDecoration(
                   labelText: 'Hubungkan ke Tahapan (Opsional)',
-                  border: OutlineInputBorder(),
                 ),
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Tanpa Tahapan (Ide Bebas)'),
+                    child: Text(
+                      'Tanpa Tahapan (Ide Bebas)',
+                      style: TextStyle(fontSize: 12, color: AppColors.primaryText),
+                    ),
                   ),
                   ..._milestones.map((m) {
                     return DropdownMenuItem<int?>(
@@ -210,6 +212,7 @@ class _BrainstormFormDialogState extends State<BrainstormFormDialog> {
                       child: Text(
                         '#${m.sortOrder + 1} ${m.name}',
                         overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                       ),
                     );
                   }),

@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Offline-first tracker for your coding projects.',
+                'Pelacak progres proyek coding offline-first.',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.secondaryText,

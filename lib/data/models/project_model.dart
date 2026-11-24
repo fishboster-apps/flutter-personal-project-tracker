@@ -1,9 +1,9 @@
 /// Enum representing lifecycle status of a project.
 enum ProjectStatus {
-  active('active', 'Active'),
-  onHold('on_hold', 'On Hold'),
-  completed('completed', 'Completed'),
-  archived('archived', 'Archived');
+  active('active', 'Aktif'),
+  onHold('on_hold', 'Tertunda'),
+  completed('completed', 'Selesai'),
+  archived('archived', 'Diarsipkan');
 
   final String value;
   final String label;

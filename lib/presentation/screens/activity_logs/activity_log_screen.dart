@@ -71,7 +71,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
       context,
       title: 'Bersihkan Riwayat',
       message:
-          'Apakah Anda yakin ingin menghapus seluruh riwayat aktivitas proyek "${widget.projectName}"?',
+          'Yakin ingin menghapus seluruh riwayat aktivitas proyek "${widget.projectName}"?',
       confirmLabel: 'Hapus Riwayat',
       onConfirm: () async {
         await _repository.clearLogsByProject(widget.projectId);
@@ -210,7 +210,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
               'Belum ada riwayat aktivitas',
               style: TextStyle(
                 color: AppColors.primaryText,
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -218,11 +218,11 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
             Text(
               _selectedFilter == null
                   ? 'Aktivitas perubahan proyek akan tercatat di sini secara otomatis.'
-                  : 'Tidak ada riwayat aktivitas untuk filter yang dipilih.',
+                  : 'Tidak ada aktivitas untuk filter ini.',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.secondaryText,
-                fontSize: 13,
+                fontSize: 12,
                 height: 1.4,
               ),
             ),
@@ -279,7 +279,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                           log.entityLabel,
                           style: const TextStyle(
                             color: AppColors.secondaryText,
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -289,7 +289,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                         log.formatRelativeTime(),
                         style: const TextStyle(
                           color: AppColors.secondaryText,
-                          fontSize: 12,
+                          fontSize: 10,
                         ),
                       ),
                     ],
@@ -299,7 +299,7 @@ class _ActivityLogScreenState extends State<ActivityLogScreen> {
                     log.description,
                     style: const TextStyle(
                       color: AppColors.primaryText,
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
                     ),

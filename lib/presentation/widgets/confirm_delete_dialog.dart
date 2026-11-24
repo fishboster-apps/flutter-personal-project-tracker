@@ -52,14 +52,14 @@ class ConfirmDeleteDialog extends StatelessWidget {
         style: const TextStyle(
           color: AppColors.primaryText,
           fontWeight: FontWeight.bold,
-          fontSize: 18,
+          fontSize: 15,
         ),
       ),
       content: Text(
         message,
         style: const TextStyle(
           color: AppColors.secondaryText,
-          fontSize: 14,
+          fontSize: 12,
         ),
       ),
       actions: [

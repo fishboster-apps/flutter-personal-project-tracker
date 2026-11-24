@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../../../core/theme.dart';
 import '../../../data/models/project_model.dart';
 import '../../../data/repositories/activity_log_repository.dart';
@@ -54,12 +55,15 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late final CopyContextService _copyContextService;
 
   ProjectModel? _project;
-  MilestoneProgress _milestoneProgress =
-      const MilestoneProgress(total: 0, completed: 0);
-  ItemSummaryCount _brainstormCount =
-      const ItemSummaryCount(total: 0, completed: 0);
-  ItemSummaryCount _issueCount =
-      const ItemSummaryCount(total: 0, completed: 0);
+  MilestoneProgress _milestoneProgress = const MilestoneProgress(
+    total: 0,
+    completed: 0,
+  );
+  ItemSummaryCount _brainstormCount = const ItemSummaryCount(
+    total: 0,
+    completed: 0,
+  );
+  ItemSummaryCount _issueCount = const ItemSummaryCount(total: 0, completed: 0);
   int _referenceCount = 0;
   int _activityLogCount = 0;
   bool _isLoading = true;
@@ -69,12 +73,14 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     super.initState();
     _repository = widget.repository ?? ProjectRepository();
     _milestoneRepository = widget.milestoneRepository ?? MilestoneRepository();
-    _brainstormRepository = widget.brainstormRepository ?? BrainstormRepository();
+    _brainstormRepository =
+        widget.brainstormRepository ?? BrainstormRepository();
     _issueRepository = widget.issueRepository ?? IssueRepository();
     _referenceRepository = widget.referenceRepository ?? ReferenceRepository();
     _activityLogRepository =
         widget.activityLogRepository ?? ActivityLogRepository();
-    _copyContextService = widget.copyContextService ??
+    _copyContextService =
+        widget.copyContextService ??
         CopyContextService(
           projectRepository: _repository,
           milestoneRepository: _milestoneRepository,
@@ -88,23 +94,28 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   Future<void> _loadProject() async {
     setState(() => _isLoading = true);
     final project = await _repository.getProjectById(widget.projectId);
-    final progress =
-        await _milestoneRepository.getProjectProgress(widget.projectId);
-    final brainstormCount =
-        await _brainstormRepository.getCountByProject(widget.projectId);
-    final issueCount =
-        await _issueRepository.getCountByProject(widget.projectId);
+    final progress = await _milestoneRepository.getProjectProgress(
+      widget.projectId,
+    );
+    final brainstormCount = await _brainstormRepository.getCountByProject(
+      widget.projectId,
+    );
+    final issueCount = await _issueRepository.getCountByProject(
+      widget.projectId,
+    );
     int referenceCount = 0;
     try {
-      referenceCount =
-          await _referenceRepository.getReferenceCountByProject(widget.projectId);
+      referenceCount = await _referenceRepository.getReferenceCountByProject(
+        widget.projectId,
+      );
     } catch (_) {
       // Keep 0 if failed
     }
     int activityLogCount = 0;
     try {
-      activityLogCount =
-          await _activityLogRepository.getLogCountByProject(widget.projectId);
+      activityLogCount = await _activityLogRepository.getLogCountByProject(
+        widget.projectId,
+      );
     } catch (_) {
       // Keep 0 if failed
     }
@@ -138,8 +149,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   Future<void> _copyProjectContext() async {
     if (_project?.id == null) return;
     try {
-      final contextText =
-          await _copyContextService.generateProjectContext(_project!.id!);
+      final contextText = await _copyContextService.generateProjectContext(
+        _project!.id!,
+      );
       if (!mounted) return;
       await _copyContextService.copyToClipboard(
         context,
@@ -162,7 +174,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       context,
       title: 'Hapus Proyek',
       message:
-          'Apakah Anda yakin ingin menghapus proyek "${_project?.name}"? Seluruh tahapan, ide, masalah, dan referensi terkait akan ikut terhapus.',
+          'Yakin ingin menghapus proyek "${_project?.name}"? Seluruh tahapan, ide, masalah, dan referensi terkait akan ikut terhapus.',
       confirmLabel: 'Hapus Proyek',
       onConfirm: () async {
         if (_project?.id != null) {
@@ -188,9 +200,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_project == null) {
@@ -251,13 +261,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             Row(
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(project.status).withValues(alpha: 0.15),
+                    color: _getStatusColor(project.status)
+                        .withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: _getStatusColor(project.status).withValues(alpha: 0.5),
+                      color: _getStatusColor(project.status)
+                          .withValues(alpha: 0.5),
                     ),
                   ),
                   child: Text(
@@ -265,7 +279,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                     style: TextStyle(
                       color: _getStatusColor(project.status),
                       fontWeight: FontWeight.w600,
-                      fontSize: 12,
+                      fontSize: 10,
                     ),
                   ),
                 ),
@@ -274,7 +288,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   'Progres: ${_milestoneProgress.percentageInt}%',
                   style: const TextStyle(
                     color: AppColors.primaryAccent,
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -303,9 +317,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               Text(
                 'Deskripsi',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppColors.secondaryText,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: AppColors.secondaryText,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 6),
               Container(
@@ -320,7 +334,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   project.description,
                   style: const TextStyle(
                     color: AppColors.primaryText,
-                    fontSize: 14,
+                    fontSize: 12,
                     height: 1.4,
                   ),
                 ),
@@ -341,7 +355,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   'Dibuat: ${dateFormat.format(project.createdAt)}',
                   style: const TextStyle(
                     color: AppColors.secondaryText,
-                    fontSize: 12,
+                    fontSize: 10,
                   ),
                 ),
               ],
@@ -355,9 +369,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             Text(
               'Modul Proyek',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.secondaryText,
-                    fontWeight: FontWeight.bold,
-                  ),
+                color: AppColors.secondaryText,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
 
@@ -491,14 +505,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           style: const TextStyle(
             color: AppColors.primaryText,
             fontWeight: FontWeight.w500,
+            fontSize: 15,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: const TextStyle(color: AppColors.secondaryText, fontSize: 12),
         ),
-        trailing:
-            const Icon(Icons.chevron_right, color: AppColors.secondaryText),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: AppColors.secondaryText,
+        ),
         onTap: onTap,
       ),
     );

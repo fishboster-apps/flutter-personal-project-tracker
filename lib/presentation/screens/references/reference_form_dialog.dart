@@ -232,7 +232,7 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
         style: const TextStyle(
           color: AppColors.primaryText,
           fontWeight: FontWeight.bold,
-          fontSize: 18,
+          fontSize: 15,
         ),
       ),
       content: SingleChildScrollView(
@@ -245,10 +245,10 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
               // Judul Referensi
               TextFormField(
                 controller: _titleController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Judul Referensi *',
                   hintText: 'Contoh: Dokumentasi Flutter SQLite',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -263,12 +263,12 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
               // Alamat Tautan (URL)
               TextFormField(
                 controller: _urlController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Alamat Tautan / URL Web *',
                   hintText: 'https://github.com/... atau docs.flutter.dev',
-                  helperText: 'Tempelkan tautan web dari browser (diawali https:// atau domain web)',
+                  helperText: 'Awali dengan https:// atau alamat web yang valid',
                   helperMaxLines: 2,
-                  border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.url,
                 validator: (val) {
@@ -289,7 +289,6 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
                 initialValue: effectiveValue,
                 decoration: const InputDecoration(
                   labelText: 'Hubungkan Tautan ke',
-                  border: OutlineInputBorder(),
                 ),
                 isExpanded: true,
                 items: [
@@ -298,6 +297,7 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
                     child: Text(
                       'Tautan Umum Proyek (Bebas / Standalone)',
                       overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12, color: AppColors.primaryText),
                     ),
                   ),
                   if (_brainstorms.isNotEmpty) ...[
@@ -307,7 +307,7 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
                         child: Text(
                           'Ide: ${b.title}',
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: AppColors.primaryAccent),
+                          style: const TextStyle(fontSize: 12, color: AppColors.primaryAccent),
                         ),
                       );
                     }),
@@ -319,7 +319,7 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
                         child: Text(
                           'Kendala: ${i.title}',
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: AppColors.warning),
+                          style: const TextStyle(fontSize: 12, color: AppColors.warning),
                         ),
                       );
                     }),
@@ -336,10 +336,10 @@ class _ReferenceFormDialogState extends State<ReferenceFormDialog> {
               // Catatan Tambahan (Opsional)
               TextFormField(
                 controller: _notesController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Catatan Tambahan (Opsional)',
                   hintText: 'Catatan penting mengenai isi tautan...',
-                  border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
                 maxLines: 3,

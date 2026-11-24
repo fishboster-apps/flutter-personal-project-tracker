@@ -73,7 +73,7 @@ class _MilestoneListScreenState extends State<MilestoneListScreen> {
           children: [
             const Text(
               'Tahapan / Milestones',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(
               widget.projectName,
@@ -139,7 +139,7 @@ class _MilestoneListScreenState extends State<MilestoneListScreen> {
                 style: const TextStyle(
                   color: AppColors.primaryText,
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 12,
                 ),
               ),
               const Spacer(),
@@ -148,7 +148,7 @@ class _MilestoneListScreenState extends State<MilestoneListScreen> {
                 style: const TextStyle(
                   color: AppColors.primaryAccent,
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -275,22 +275,22 @@ class _MilestoneListScreenState extends State<MilestoneListScreen> {
             const Text(
               'Belum ada tahapan',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Bagi proyek Anda menjadi tahapan-tahapan kecil yang terukur untuk memudahkan proses pengerjaan.',
+              'Bagi proyek ke tahapan terukur agar progres terpantau rapi.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColors.secondaryText,
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
+            FilledButton(
               onPressed: () async {
                 final added = await MilestoneFormDialog.show(
                   context,
@@ -301,12 +301,7 @@ class _MilestoneListScreenState extends State<MilestoneListScreen> {
                   _loadData();
                 }
               },
-              icon: const Icon(Icons.add),
-              label: const Text('Tambah Tahapan Pertama'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryAccent,
-                foregroundColor: AppColors.background,
-              ),
+              child: const Text('Tambah Tahapan Pertama'),
             ),
           ],
         ),

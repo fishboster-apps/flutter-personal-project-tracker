@@ -155,7 +155,7 @@ class _IssueFormDialogState extends State<IssueFormDialog> {
         style: const TextStyle(
           color: AppColors.primaryText,
           fontWeight: FontWeight.bold,
-          fontSize: 18,
+          fontSize: 15,
         ),
       ),
       content: SingleChildScrollView(
@@ -167,10 +167,10 @@ class _IssueFormDialogState extends State<IssueFormDialog> {
             children: [
               TextFormField(
                 controller: _titleController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Judul Masalah / Bug *',
                   hintText: 'Contoh: Memory leak pada form upload',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -183,10 +183,10 @@ class _IssueFormDialogState extends State<IssueFormDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _descController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Deskripsi Kendala',
                   hintText: 'Keterangan error, reproduksi bug, atau catatan teknis',
-                  border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
                 maxLines: 3,
@@ -197,12 +197,14 @@ class _IssueFormDialogState extends State<IssueFormDialog> {
                 initialValue: _selectedMilestoneId,
                 decoration: const InputDecoration(
                   labelText: 'Hubungkan ke Tahapan (Opsional)',
-                  border: OutlineInputBorder(),
                 ),
                 items: [
                   const DropdownMenuItem<int?>(
                     value: null,
-                    child: Text('Tanpa Tahapan (Kendala Umum)'),
+                    child: Text(
+                      'Tanpa Tahapan (Kendala Umum)',
+                      style: TextStyle(fontSize: 12, color: AppColors.primaryText),
+                    ),
                   ),
                   ..._milestones.map((m) {
                     return DropdownMenuItem<int?>(
@@ -210,6 +212,7 @@ class _IssueFormDialogState extends State<IssueFormDialog> {
                       child: Text(
                         '#${m.sortOrder + 1} ${m.name}',
                         overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                       ),
                     );
                   }),

@@ -167,7 +167,7 @@ void main() {
 
       expect(find.text('Personal Tracker'), findsOneWidget);
       expect(find.text('A great tracker app'), findsOneWidget);
-      expect(find.text('Active'), findsWidgets);
+      expect(find.text('Aktif'), findsWidgets);
     });
 
     testWidgets('ProjectFormScreen validates empty name', (tester) async {

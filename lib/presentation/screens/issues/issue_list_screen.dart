@@ -93,7 +93,7 @@ class _IssueListScreenState extends State<IssueListScreen> {
           children: [
             const Text(
               'Masalah & Kendala',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(
               widget.projectName,
@@ -181,7 +181,7 @@ class _IssueListScreenState extends State<IssueListScreen> {
       labelStyle: TextStyle(
         color: isSelected ? AppColors.primaryAccent : AppColors.secondaryText,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        fontSize: 13,
+        fontSize: 12,
       ),
       backgroundColor: AppColors.surface,
       side: BorderSide(
@@ -273,7 +273,7 @@ class _IssueListScreenState extends State<IssueListScreen> {
                             ? 'Tahapan: $milestoneName'
                             : 'Kendala Umum',
                         style: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           color: AppColors.secondaryText,
                         ),
                       ),
@@ -304,22 +304,22 @@ class _IssueListScreenState extends State<IssueListScreen> {
             const Text(
               'Belum ada masalah',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Dokumentasikan kendala teknis atau bug yang ditemukan agar mudah ditelusuri penyelesaiannya.',
+              'Catat kendala teknis dan bug agar solusi mudah ditelusuri.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColors.secondaryText,
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
+            FilledButton(
               onPressed: () async {
                 final added = await IssueFormDialog.show(
                   context,
@@ -335,12 +335,7 @@ class _IssueListScreenState extends State<IssueListScreen> {
                   _loadData();
                 }
               },
-              icon: const Icon(Icons.add),
-              label: const Text('Catat Masalah Pertama'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryAccent,
-                foregroundColor: AppColors.background,
-              ),
+              child: const Text('Catat Masalah Pertama'),
             ),
           ],
         ),

@@ -93,7 +93,7 @@ class _BrainstormListScreenState extends State<BrainstormListScreen> {
           children: [
             const Text(
               'Ide & Gagasan',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(
               widget.projectName,
@@ -181,7 +181,7 @@ class _BrainstormListScreenState extends State<BrainstormListScreen> {
       labelStyle: TextStyle(
         color: isSelected ? AppColors.primaryAccent : AppColors.secondaryText,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        fontSize: 13,
+        fontSize: 12,
       ),
       backgroundColor: AppColors.surface,
       side: BorderSide(
@@ -273,7 +273,7 @@ class _BrainstormListScreenState extends State<BrainstormListScreen> {
                             ? 'Tahapan: $milestoneName'
                             : 'Tanpa Tahapan',
                         style: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           color: AppColors.secondaryText,
                         ),
                       ),
@@ -304,22 +304,22 @@ class _BrainstormListScreenState extends State<BrainstormListScreen> {
             const Text(
               'Belum ada ide',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Catat gagasan fitur atau konsep baru tanpa harus langsung menjadikannya pekerjaan.',
+              'Catat ide fitur atau eksperimen teknologi untuk proyek ini.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColors.secondaryText,
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
+            FilledButton(
               onPressed: () async {
                 final added = await BrainstormFormDialog.show(
                   context,
@@ -335,12 +335,7 @@ class _BrainstormListScreenState extends State<BrainstormListScreen> {
                   _loadData();
                 }
               },
-              icon: const Icon(Icons.add),
-              label: const Text('Tambah Ide Pertama'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryAccent,
-                foregroundColor: AppColors.background,
-              ),
+              child: const Text('Tambah Ide Pertama'),
             ),
           ],
         ),

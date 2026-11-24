@@ -129,7 +129,7 @@ class _MilestoneFormDialogState extends State<MilestoneFormDialog> {
         style: const TextStyle(
           color: AppColors.primaryText,
           fontWeight: FontWeight.bold,
-          fontSize: 18,
+          fontSize: 15,
         ),
       ),
       content: SingleChildScrollView(
@@ -141,10 +141,10 @@ class _MilestoneFormDialogState extends State<MilestoneFormDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Nama Tahapan *',
                   hintText: 'Contoh: Authentication & Database',
-                  border: OutlineInputBorder(),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -157,10 +157,10 @@ class _MilestoneFormDialogState extends State<MilestoneFormDialog> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _descController,
+                style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
                 decoration: const InputDecoration(
                   labelText: 'Deskripsi',
                   hintText: 'Keterangan target atau scope tahapan ini',
-                  border: OutlineInputBorder(),
                   alignLabelWithHint: true,
                 ),
                 maxLines: 3,

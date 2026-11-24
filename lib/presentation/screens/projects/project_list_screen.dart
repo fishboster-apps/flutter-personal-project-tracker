@@ -114,34 +114,20 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: TextField(
               controller: _searchController,
+              style: const TextStyle(fontSize: 12, color: AppColors.primaryText),
               decoration: InputDecoration(
                 hintText: 'Cari proyek...',
-                hintStyle: const TextStyle(color: AppColors.secondaryText),
-                prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText),
+                prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.secondaryText),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: AppColors.secondaryText),
+                        icon: const Icon(Icons.clear, size: 18, color: AppColors.secondaryText),
                         onPressed: () {
                           _searchController.clear();
                           _loadProjects();
                         },
                       )
                     : null,
-                filled: true,
-                fillColor: AppColors.surface,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.primaryAccent),
-                ),
               ),
               onChanged: (_) => _loadProjects(),
             ),
@@ -221,7 +207,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
       labelStyle: TextStyle(
         color: isSelected ? AppColors.primaryAccent : AppColors.secondaryText,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        fontSize: 13,
+        fontSize: 12,
       ),
       backgroundColor: AppColors.surface,
       side: BorderSide(
@@ -265,7 +251,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     child: Text(
                       project.name,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryText,
                       ),
@@ -283,7 +269,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                       project.status.label,
                       style: TextStyle(
                         color: statusColor,
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -297,7 +283,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: AppColors.secondaryText,
                   ),
                 ),
@@ -314,7 +300,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   Text(
                     '${progress.total} Tahapan',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       color: AppColors.secondaryText,
                     ),
                   ),
@@ -322,7 +308,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   Text(
                     '${progress.percentageInt}% Selesai',
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       fontWeight: FontWeight.w500,
                       color: AppColors.secondaryText,
                     ),
@@ -359,7 +345,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                   ? 'Tidak ada proyek yang sesuai'
                   : 'Belum ada proyek',
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryText,
               ),
@@ -368,16 +354,16 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
             Text(
               isSearching
                   ? 'Coba ganti kata kunci pencarian atau reset filter status.'
-                  : 'Mulai kelola progres pengembangan proyek Anda dengan menambahkan proyek pertama.',
+                  : 'Mulai pantau progres dengan membuat proyek pertama Anda.',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColors.secondaryText,
               ),
             ),
             if (!isSearching) ...[
               const SizedBox(height: 20),
-              ElevatedButton.icon(
+              FilledButton(
                 onPressed: () async {
                   final created = await Navigator.push<bool>(
                     context,
@@ -389,12 +375,7 @@ class _ProjectListScreenState extends State<ProjectListScreen> {
                     _loadProjects();
                   }
                 },
-                icon: const Icon(Icons.add),
-                label: const Text('Buat Proyek Pertama'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryAccent,
-                  foregroundColor: AppColors.background,
-                ),
+                child: const Text('Buat Proyek Pertama'),
               ),
             ],
           ],

@@ -123,7 +123,7 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
     ConfirmDeleteDialog.show(
       context,
       title: 'Hapus Ide',
-      message: 'Apakah Anda yakin ingin menghapus ide "${_brainstorm?.title}"?',
+      message: 'Yakin ingin menghapus ide "${_brainstorm?.title}"?',
       confirmLabel: 'Hapus Ide',
       onConfirm: () async {
         if (_brainstorm?.id != null) {
@@ -239,22 +239,22 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            idea.isCompleted ? 'Ide Telah Selesai' : 'Ide Belum Terealisasi',
+                            idea.isCompleted ? 'Sudah Terealisasi' : 'Belum Terealisasi',
                             style: TextStyle(
                               color: idea.isCompleted
                                   ? AppColors.success
                                   : AppColors.warning,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 12,
                             ),
                           ),
                           Text(
                             _connectedMilestone != null
                                 ? 'Tahapan: ${_connectedMilestone!.name}'
-                                : 'Ide Bebas (Tanpa Tahapan)',
+                                : 'Ide Bebas',
                             style: const TextStyle(
                               color: AppColors.secondaryText,
-                              fontSize: 12,
+                              fontSize: 10,
                             ),
                           ),
                         ],
@@ -270,7 +270,7 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
             // Description
             if (idea.description.isNotEmpty) ...[
               Text(
-                'Deskripsi & Konsep',
+                'Deskripsi Ide',
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: AppColors.secondaryText,
                       fontWeight: FontWeight.bold,
@@ -289,7 +289,7 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
                   idea.description,
                   style: const TextStyle(
                     color: AppColors.primaryText,
-                    fontSize: 14,
+                    fontSize: 12,
                     height: 1.4,
                   ),
                 ),
@@ -308,7 +308,7 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                TextButton.icon(
+                TextButton(
                   onPressed: () async {
                     final added = await ReferenceFormDialog.show(
                       context,
@@ -321,12 +321,11 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
                       _loadData();
                     }
                   },
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Tambah Tautan'),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.primaryAccent,
                     visualDensity: VisualDensity.compact,
                   ),
+                  child: const Text('Tambah Tautan'),
                 ),
               ],
             ),
@@ -341,8 +340,8 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: const Text(
-                  'Belum ada referensi tautan untuk ide ini.',
-                  style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                  'Belum ada referensi tautan.',
+                  style: TextStyle(color: AppColors.secondaryText, fontSize: 12),
                 ),
               )
             else
@@ -363,7 +362,7 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
                   'Dibuat: ${dateFormat.format(idea.createdAt)}',
                   style: const TextStyle(
                     color: AppColors.secondaryText,
-                    fontSize: 12,
+                    fontSize: 10,
                   ),
                 ),
               ],
@@ -382,13 +381,13 @@ class _BrainstormDetailScreenState extends State<BrainstormDetailScreen> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         title: Text(
           ref.title,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primaryText),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryText),
         ),
         subtitle: Text(
           ref.url,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 12, color: AppColors.primaryAccent),
+          style: const TextStyle(fontSize: 10, color: AppColors.primaryAccent),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

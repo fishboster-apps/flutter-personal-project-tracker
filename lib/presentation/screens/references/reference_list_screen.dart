@@ -119,7 +119,7 @@ class _ReferenceListScreenState extends State<ReferenceListScreen> {
           children: [
             const Text(
               'Referensi & Tautan',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
             Text(
               widget.projectName,
@@ -295,7 +295,7 @@ class _ReferenceListScreenState extends State<ReferenceListScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   color: AppColors.primaryAccent,
                   decoration: TextDecoration.underline,
                 ),
@@ -333,7 +333,7 @@ class _ReferenceListScreenState extends State<ReferenceListScreen> {
                         relationLabel,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight: FontWeight.w600,
                           color: relationColor,
                         ),
@@ -365,22 +365,22 @@ class _ReferenceListScreenState extends State<ReferenceListScreen> {
             const Text(
               'Belum ada referensi tautan',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primaryText,
               ),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Simpan tautan dokumentasi, artikel, repositori GitHub, atau aset penting proyek Anda di sini agar tidak hilang.',
+              'Simpan dokumentasi, repositori, dan referensi penting di sini.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 color: AppColors.secondaryText,
               ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
+            FilledButton(
               onPressed: () async {
                 final added = await ReferenceFormDialog.show(
                   context,
@@ -393,12 +393,7 @@ class _ReferenceListScreenState extends State<ReferenceListScreen> {
                   _loadData();
                 }
               },
-              icon: const Icon(Icons.add),
-              label: const Text('Tambah Tautan Pertama'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryAccent,
-                foregroundColor: AppColors.background,
-              ),
+              child: const Text('Tambah Tautan Pertama'),
             ),
           ],
         ),

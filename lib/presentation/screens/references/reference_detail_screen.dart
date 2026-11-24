@@ -81,7 +81,7 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
     ConfirmDeleteDialog.show(
       context,
       title: 'Hapus Referensi',
-      message: 'Apakah Anda yakin ingin menghapus referensi "${_reference?.title}"?',
+      message: 'Yakin ingin menghapus referensi "${_reference?.title}"?',
       confirmLabel: 'Hapus Referensi',
       onConfirm: () async {
         if (_reference?.id != null) {
@@ -189,7 +189,7 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
                     ref.url,
                     style: const TextStyle(
                       color: AppColors.primaryText,
-                      fontSize: 14,
+                      fontSize: 12,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -197,25 +197,15 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton.icon(
+                        child: FilledButton(
                           onPressed: () => _launcherService.openUrl(ref.url, context: context),
-                          icon: const Icon(Icons.open_in_new, size: 18),
-                          label: const Text('Buka di Browser'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryAccent,
-                            foregroundColor: AppColors.background,
-                          ),
+                          child: const Text('Buka di Browser'),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      OutlinedButton.icon(
+                      OutlinedButton(
                         onPressed: () => UrlLauncherService.copyToClipboard(ref.url, context: context),
-                        icon: const Icon(Icons.copy, size: 18),
-                        label: const Text('Salin Tautan'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primaryText,
-                          side: const BorderSide(color: AppColors.border),
-                        ),
+                        child: const Text('Salin Tautan'),
                       ),
                     ],
                   ),
@@ -247,7 +237,7 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
                 ref.notes!,
                 style: const TextStyle(
                   color: AppColors.primaryText,
-                  fontSize: 14,
+                  fontSize: 12,
                   height: 1.5,
                 ),
               ),
@@ -267,11 +257,11 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
                     children: [
                       const Text(
                         'Dibuat:',
-                        style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                        style: TextStyle(color: AppColors.secondaryText, fontSize: 10),
                       ),
                       Text(
                         dateFormat.format(ref.createdAt),
-                        style: const TextStyle(color: AppColors.primaryText, fontSize: 13),
+                        style: const TextStyle(color: AppColors.primaryText, fontSize: 10),
                       ),
                     ],
                   ),
@@ -281,11 +271,11 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
                     children: [
                       const Text(
                         'Terakhir Diperbarui:',
-                        style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                        style: TextStyle(color: AppColors.secondaryText, fontSize: 10),
                       ),
                       Text(
                         dateFormat.format(ref.updatedAt),
-                        style: const TextStyle(color: AppColors.primaryText, fontSize: 13),
+                        style: const TextStyle(color: AppColors.primaryText, fontSize: 10),
                       ),
                     ],
                   ),
@@ -318,7 +308,7 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
                 style: const TextStyle(
                   color: AppColors.primaryAccent,
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: 10,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -347,7 +337,7 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
                 style: const TextStyle(
                   color: AppColors.warning,
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: 10,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -370,11 +360,11 @@ class _ReferenceDetailScreenState extends State<ReferenceDetailScreen> {
           Icon(Icons.folder_outlined, size: 16, color: AppColors.secondaryText),
           SizedBox(width: 6),
           Text(
-            'Tautan Umum Proyek (Bebas)',
+            'Tautan Umum Proyek',
             style: TextStyle(
               color: AppColors.secondaryText,
               fontWeight: FontWeight.w500,
-              fontSize: 13,
+              fontSize: 10,
             ),
           ),
         ],

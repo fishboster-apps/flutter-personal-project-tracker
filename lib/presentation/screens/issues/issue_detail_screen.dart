@@ -123,7 +123,7 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
     ConfirmDeleteDialog.show(
       context,
       title: 'Hapus Masalah',
-      message: 'Apakah Anda yakin ingin menghapus masalah "${_issue?.title}"?',
+      message: 'Yakin ingin menghapus masalah "${_issue?.title}"?',
       confirmLabel: 'Hapus Masalah',
       onConfirm: () async {
         if (_issue?.id != null) {
@@ -239,22 +239,22 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            issue.isCompleted ? 'Kendala Selesai / Teratasi' : 'Kendala Masih Terjadi',
+                            issue.isCompleted ? 'Kendala Teratasi' : 'Kendala Aktif',
                             style: TextStyle(
                               color: issue.isCompleted
                                   ? AppColors.success
                                   : AppColors.warning,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 12,
                             ),
                           ),
                           Text(
                             _connectedMilestone != null
                                 ? 'Tahapan: ${_connectedMilestone!.name}'
-                                : 'Kendala Bebas (Tanpa Tahapan)',
+                                : 'Kendala Bebas',
                             style: const TextStyle(
                               color: AppColors.secondaryText,
-                              fontSize: 12,
+                              fontSize: 10,
                             ),
                           ),
                         ],
@@ -289,7 +289,7 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
                   issue.description,
                   style: const TextStyle(
                     color: AppColors.primaryText,
-                    fontSize: 14,
+                    fontSize: 12,
                     height: 1.4,
                   ),
                 ),
@@ -308,7 +308,7 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                TextButton.icon(
+                TextButton(
                   onPressed: () async {
                     final added = await ReferenceFormDialog.show(
                       context,
@@ -321,12 +321,11 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
                       _loadData();
                     }
                   },
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Tambah Tautan'),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.primaryAccent,
                     visualDensity: VisualDensity.compact,
                   ),
+                  child: const Text('Tambah Tautan'),
                 ),
               ],
             ),
@@ -341,8 +340,8 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: const Text(
-                  'Belum ada referensi tautan untuk kendala ini.',
-                  style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                  'Belum ada referensi tautan.',
+                  style: TextStyle(color: AppColors.secondaryText, fontSize: 12),
                 ),
               )
             else
@@ -363,7 +362,7 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
                   'Dibuat: ${dateFormat.format(issue.createdAt)}',
                   style: const TextStyle(
                     color: AppColors.secondaryText,
-                    fontSize: 12,
+                    fontSize: 10,
                   ),
                 ),
               ],
@@ -382,13 +381,13 @@ class _IssueDetailScreenState extends State<IssueDetailScreen> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         title: Text(
           ref.title,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primaryText),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryText),
         ),
         subtitle: Text(
           ref.url,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 12, color: AppColors.primaryAccent),
+          style: const TextStyle(fontSize: 10, color: AppColors.primaryAccent),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

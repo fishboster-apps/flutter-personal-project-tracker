@@ -174,7 +174,7 @@ void main() {
       // Project info
       expect(context, contains('# Proyek: Tracker Master'));
       expect(context, contains('A comprehensive project management app for solo devs'));
-      expect(context, contains('Status Proyek: Active'));
+      expect(context, contains('Status Proyek: Aktif'));
 
       // Milestones
       expect(context, contains('## Tahapan Pengembangan'));
