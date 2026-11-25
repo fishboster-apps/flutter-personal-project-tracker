@@ -101,6 +101,7 @@ lib/
 - [`docs/TODOLIST-PHASE-6.md`](docs/TODOLIST-PHASE-6.md) — Checklist Phase 6
 - [`docs/TODOLIST-PHASE-7.md`](docs/TODOLIST-PHASE-7.md) — Checklist Phase 7
 - [`docs/TODOLIST-PHASE-8.md`](docs/TODOLIST-PHASE-8.md) — Checklist Phase 8
+- [`PRIVACY-POLICY.md`](PRIVACY-POLICY.md) — Kebijakan Privasi (ID & EN)
 
 ---
 
@@ -122,4 +123,14 @@ flutter analyze
 
 ---
 
-*Proyek ini dikembangkan untuk penggunaan pribadi sebagai solo developer tool.*
+## Ketentuan Penggunaan & Lisensi
+
+Kode sumber dalam repository ini dapat digunakan dengan bebas dan bijak, dengan ketentuan berikut:
+
+- **Penggunaan & Pengembangan Komersial:** Anda dipersilakan untuk menggunakan, mempelajari, memodifikasi, dan mengembangkan kode ini lebih lanjut untuk keperluan pribadi maupun komersial.
+- **Larangan Klaim Sepihak:** Dilarang mengklaim kepemilikan asli repository ini secara sepihak, menghapus atribusi pembuat asli (**Fishboster**), atau mengunggah ulang (*re-upload*/*re-publish*) secara mentah sebagai karya cipta pribadi.
+- **Atribusi & Tanggung Jawab:** Jika digunakan sebagai basis proyek turunan atau publikasi ulang hasil pengembangan, wajib tetap mencantumkan atribusi ke repository asli. Seluruh risiko penggunaan di luar repository ini menjadi tanggung jawab pengembang masing-masing (*as-is*).
+
+---
+
+*Proyek ini dikembangkan oleh Fishboster sebagai solo developer tool.*
